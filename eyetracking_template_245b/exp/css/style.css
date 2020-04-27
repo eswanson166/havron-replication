@@ -1,0 +1,231 @@
+
+
+table {
+	font-size: 14px;
+	margin: auto;
+}
+
+
+/*the experiment happens in "slides"*/
+/* .slide { */
+body{
+	/*pad the inside of the slide*/
+	padding-top: 10px;
+	padding-left: 10px;
+	padding-right: 10px;
+
+	/*center slide within the window*/
+	margin: auto auto;
+	margin-top: 0px;
+
+	/*all elements in a slide will be centered by default*/
+	text-align: center;
+
+	font-family: sans-serif;
+	font-size: 16px;
+	background-color: white;
+
+	/* FROM WEBGAZER STYLE.CSS */
+	min-width:600px!important;
+
+}
+
+/* start slide */
+ul {
+	display: inline-block;
+	text-align:left;
+}
+
+.text-center{
+	margin-left: 100px;
+	margin-right: 100px;
+}
+
+/* Video Feed Styling */
+#overlay {
+	z-index: 1;
+}
+
+
+/* Navbar styling */
+#webgazerNavbar {
+	left: 320px;
+	z-index: 0;
+	box-shadow: 0px 3px 5px #ddd;
+	border:0px;
+	background-color: #fff;
+	margin-bottom: 0;
+}
+#Accuracy a{
+	background-color: #222;
+	color: #eee;
+	left: -15px;
+	padding-left: 80px;
+	padding-right: 40px;
+
+}
+#Accuracy {
+	background-color: #222;
+	padding-left: inherit;
+}
+
+li {
+	padding-left: 50px;
+}
+.navbar-right li {
+	padding-right: 20px;
+}
+
+.helpBtn {
+	padding: 15px;
+	border: none;
+	background: none;
+	color: #777;
+}
+.helpBtn a {
+	background: none;
+	color: #777;
+}
+.helpBtn a:hover {
+	color: black!important;
+	text-decoration: none;
+}
+.modal-header {
+	border-bottom: none!important;
+}
+
+/* center img in modal popup */
+.modal-dialog{text-align:center;}
+.modal-content{display:inline-block;}
+
+
+/* Calibration button styling */
+.Calibration{
+	width: 20px;
+	height: 20px;
+	-webkit-border-radius: 25px;
+	-moz-border-radius: 25px;
+	border-radius: 25px;
+	background-color: red;
+	opacity: 0.2;
+	border-color: black;
+	border-style: solid;
+	position:fixed;
+}
+/* Calibration point position */
+#Pt1{
+	top: 70px;
+	left:340px;
+}
+#Pt2{
+	top: 70px;
+	left:50vw;
+	/* margin-left: 340; */
+}
+#Pt3{
+	top: 70px;
+	right:2vw;
+}
+#Pt4{
+	top:50vh;
+	left:2vw;
+}
+#Pt5{
+	top: 50vh;
+	left: 50vw;
+}
+#Pt6{
+	top: 50vh;
+	right:2vw;
+}
+#Pt7{
+	bottom:2vw;
+	left: 2vw;
+}
+#Pt8{
+	bottom:2vw;
+	left:50vw;
+}
+#Pt9{
+	bottom:2vw;
+	right:2vw;
+}
+
+#cocolab {
+	font-weight: bold;
+
+}
+
+#legal {
+	font-size: 0.6em;
+}
+
+#contact {
+	font-size: 0.6em;
+}
+
+
+.subj_info_title {
+	color:#036;
+	background:transparent;
+	font-size:25;
+	font-weight:bold;
+}
+
+#study_title {
+	background:transparent;
+	font-size:25;
+}
+
+div.long_form {
+	font-size: 13px;
+}
+
+fieldset {
+	border: none;
+	border-top: solid 1px #ccc;
+}
+
+div.long_form p {
+	color:#036;
+	margin: 20px 0 0 0;
+}
+
+div.long_form p.info {
+	margin:0 0 40px 0;
+	padding:0;
+	color:black;
+}
+
+div.long_form label {
+	padding: .5em .5em;
+}
+
+textarea {
+	border: 2px inset;
+}
+
+
+p.descriptor {
+	margin:0 0 0 0;
+	padding:0;
+	font-size: 20px;
+	color:red;
+}
+
+#important {
+	margin:0 0 0 0;
+	padding:0;
+	font-size: 20px;
+	color:red;
+}
+
+/* displays the imgs */
+#imgwrapper {
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-ms-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+}

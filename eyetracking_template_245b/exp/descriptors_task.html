@@ -1,0 +1,332 @@
+
+<html>
+<head>
+  <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+    <title> Select the person described! </title>
+
+
+    <!--  general js utilities -->
+    <script src="js/general_utils/jquery-1.11.1.min.js "></script>
+    <script src="js/general_utils/jquery-ui.min.js"></script>
+    <script src="js/general_utils/underscore-min.js"></script>
+    <script src="js/general_utils/sweetalert.min.js"></script>
+    <script src="js/general_utils/bootstrap.min.js"></script>
+
+    <!-- experiment logic, and experiment utilities -->
+    <script src="js/exp_run/exp-V2.js"></script>
+    <script src="js/exp_run/stream-V2.js"></script>
+    <script src="js/exp_run/mmturkey.js"></script>
+    <script src="js/exp_run/browserCheck.js"></script>
+    <script src="js/exp_run/utils.js"></script>
+    <script src="js/exp_run/preload.js"></script>
+    <script src="js/exp_run/uniqueturker.js"></script>
+
+    <!-- main experiment logic: -->
+    <script src="js/exp_run/descriptors_task.js"></script>
+
+    <!--CSS-->
+    <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
+    <link href="css/style.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- webgazer tools -->
+    <script src="js/webgazer_tools/resize_canvas.js"></script>
+    <script src="js/webgazer_tools/calibration_functions.js"></script>
+    <script src="js/webgazer_tools/main.js"></script>
+    <script src="js/webgazer_tools/precision_calculation.js"></script>
+    <script src="js/webgazer_tools/precision_store_points.js"></script>
+
+    <!-- experiment files for stimuli-->
+    <script src="js/exp_files/img_fnames.js"></script> <!-- img fnames corresponding to each of the descriptors -->
+    <script src="js/exp_files/descriptors.js"></script> <!-- list of descriptors, each constitutes an individual trial -->
+
+    <!-- INSERT UNIQUE TURKER ID HERE -->
+    <script type="text/JavaScript">
+    $(document).ready(function(){
+      var ut_id = "[INSERT YOUR UNIQUE TURKER ID HERE]"
+      if (UTWorkerLimitReached(ut_id)) {
+        $(".slide").hide();
+        $("body").html("You have already completed the maximum number of HITs allowed by this requester. Please click 'Return HIT' to avoid any impact on your approval rating.");
+      }});
+    </script>
+
+
+  </head>
+
+  <body onload="init_explogic();">
+    <script src="js/webgazer_tools/webgazer.js" type="text/javascript"></script>
+
+
+
+    <noscript>This task requires JavaScript.</noscript>
+    <div class="slide" id="i0" >
+      <div class="text-center">
+        <img src="eyes.png" alt="user" id="userpic"></img>
+        <p id="study_title"><b> Select the person described! </b></p>
+        <!-- <br> -->
+
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <p class="card-text">In this task, you will see illustrated images of two people. You will hear an instruction to click on the person who fits the description - e.g., "Click on the person with glasses".
+              <br> Your task is to click on the person described. Note: you will see the images for two seconds before clicking Continue to proceed; the images will reappear as the audio instruction plays. </p>
+            </div>
+          </div>
+
+
+
+          <div class="card border-danger mb-3" >
+            <div class="card-body text-danger">
+              <p class="card-text">
+                <b>Please read all the following information carefully before deciding whether to accept the HIT. </b></p>
+                During this task, your eye movements will be recorded using your web camera. <br>
+                Unfortunately, you will be unable to complete this HIT if you have any uncorrected vision impairments (e.g.,  amblyopia, or 'lazy eye').
+                If you use glasses/contact lenses for near or farsightedness, that's fine.
+                <br>
+                We will NOT record images of your face at any point: we will only record the coordinates of your eye movements. <br>
+              </div>
+            </div>
+
+            <div class="card border-success mb-3">
+              <div class="card-body">
+                <h5 class="card-title"> Browser Width</h5>
+                <p class="card-text"> Your browser window must be at least 1280 pixels wide, while fitting within your computer display: you must be able to see everything in the browser window.
+                  <br>
+                  Please mazimize your browser now, and keep it maximized throughout the task.
+                  <br>
+                  If you're unable to maximize it to at least 1280 pixels wide, do not accept the HIT.  you won't be able to start the HIT and will have to return it. </b></p>
+                  <b> Your current browser width is: <span id="dimensions"></span></b>
+                  <script>
+                  $(window).resize(function() {
+                    $("#dimensions").html($(window).width());
+                  }).resize(); </script>
+                </div>
+              </div>
+
+              <div class="card border-success mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">Sound</h5>
+                  <p class="card-text">You <b> must </b> be able to play sound on your computer: you won't be able to complete the task satisfactorily if not.
+                  </p>
+                </div>
+              </div>
+
+
+              <div class="card border-success mb-3">
+                <div class="card-body">
+                  <h5 class="card-title"> Browser version </h5>
+
+                  <p class="card-text">You must be using one of the following browser versions:
+                    <ul>
+                      <p class="text-left">
+                        <li> <b> Google Chrome (version 53 or newer) - (Recommended browser) </b> </li>
+                        <li> Microsoft Edge (version 12 or newer) </li>
+                        <li> Mozilla Firefox (version 42 or newer) </li>
+                        <li> Opera (version 40 or newer) </li>
+                        <li> Safari (version 11 or newer) </li>
+                      </p>
+                    </ul>
+                  </p>
+                </div>
+              </div>
+
+
+              <div class="card border-success mb-3">
+                <div class="card-body">
+                  <h5 class="card-title"> Device and Lighting </h5>
+                  <p class="card-text">
+                    <ul>
+                      <li> You must be using a desktop or laptop with a web camera - you cannot use a tablet or cell phone </li>
+                      <li> Your device must be placed on a hard surface (e.g. table or desk), with the camera at your eye level </li>
+                      <li> You must be in a brightly lit room, with your face fully illuminated  </li>
+                      <li> You must stay in the same position and keep your head still throughout the calibration phase and task (around 7.5 mins)</li>
+                      <li> You must keep your browser maximized throughout the task </li>
+                      <li> If you can read the screen comfortably without glasses, please complete the task without them </li>
+                    </ul>
+                  </p>
+                </div>
+              </div>
+
+              <div class="card border-success mb-3">
+                <div class="card-body">
+                  <h5 class="card-title"> Calibration Phase </h5>
+                  <p class="card-text">
+                    Once you click Start, you will be enter a 'Calibration' phase before starting the task, where you can check that your head is in the correct position and your face is fully illuminated.
+                    <br>
+                    <b> IMPORTANT: You may need to perform the Calibration several times to achieve the required accuracy score (50%).
+                      <br>
+                      If you are not in a brightly lit room, with your device on a hard surface and the camera at eye level, you may be unable to achieve the required Accuracy score, and will have to return the HIT. </b>
+                      <br>
+                      <br>
+                      After completing the Calibration, you will proceed to the task. At the end, you will be asked some brief questions about yourself. The entire HIT will take around 7.5 minutes in total.
+                      <br>
+                    </p>
+                  </div>
+                </div>
+
+                Please only click <b> Start </b> if you agree to all the above.
+
+                <br>
+                <br>
+
+                <p id="windowsize_err"><font color="red"> Your browser window must be at least 1280 pixels wide. Please maximize it. If you cannot maximize it to at least 1280 pixels wide, please return the HIT. </font></p>
+                <button id="start_button" type="button">Start</button> <br><br>
+                There will be multiple posted versions of this HIT throughout the day. Please only attempt one. Thank you!<br>
+
+                <p id="legal"> <b>LEGAL INFORMATION:</b>
+                  Please read the information below. By clicking Start, you agree that you have read the information and consent to participate in the survey.
+                  We invite you to participate in a research study on language production and comprehension. Your experimenter will ask you to do a linguistic task such as reading sentences or words, naming pictures or describing scenes, making up sentences of your own, or participating in a simple language game.
+                  <br>
+                  There are no risks or benefits of any kind involved in this study. You will be paid for your participation at the posted rate. If you have read this form and have decided to participate in this experiment, please understand your participation is voluntary and you have the right to withdraw your consent or discontinue participation at any time without penalty or loss of benefits to which you are otherwise entitled. You have the right to refuse to do particular tasks. Your individual privacy will be maintained in all published and written data resulting from the study. You may print this form for your records.
+                  <br>
+                  <b>CONTACT INFORMATION:</b>
+                  If you have any questions, concerns or complaints about this research study, its procedures, risks and benefits, you should contact the Protocol Director Meghan Sumner at (650)-725-9336.
+                  If you are not satisfied with how this study is being conducted, or if you have any concerns, complaints, or general questions about the research or your rights as a participant, please contact the Stanford Institutional Review Board (IRB) to speak to someone independent of the research team at (650)-723-2480 or toll free at 1-866-680-2906. You can also write to the Stanford IRB, Stanford University, 3000 El Camino Real, Five Palo Alto Square, 4th Floor, Palo Alto, CA 94306 USA.
+                  <br>
+                  If you agree to participate, please proceed to the study tasks. </p>
+                </div>
+              </div>
+
+
+              <div class="slide"  id="training_and_calibration">
+                <!-- <p> CALIBRATION INSTRUCTIONS </p> -->
+                <canvas id="plotting_canvas" width="1" height="1" style="cursor:crosshair;"></canvas>
+
+                <!-- NAVIGATION BAR -->
+                <nav id="webgazerNavbar" class="navbar navbar-nav navbar-fixed-top">
+                  <div class="container-fluid">
+                    <div class="navbar-header">
+                      <button id="start_camera" onclick="_s.start_camera()">Start Camera</button>
+                      <button id="start_calibration" onclick="Restart()"> Calibrate</button>
+                      <!-- <button id="restart_calibration" onclick="Restart()">recalibrate</button> <!--hide until done once -->
+                      <button id = 'begin_task' onclick="_s.finish_calibration_start_task()"> Begin Task</button>
+                      <button id = 'helpbutton' onclick="helpModalShow()"> Help </button>
+
+                      <a class id="Accuracy"> </a>
+                    </div>
+                  </div>
+                </nav>
+
+
+                <!-- Calibration points -->
+                <div class="calibrationDiv">
+                  <input type="button" class="Calibration" id="Pt1"></input>
+                  <input type="button" class="Calibration" id="Pt2"></input>
+                  <input type="button" class="Calibration" id="Pt3"></input>
+                  <input type="button" class="Calibration" id="Pt4"></input>
+                  <input type="button" class="Calibration" id="Pt5"></input>
+                  <input type="button" class="Calibration" id="Pt6"></input>
+                  <input type="button" class="Calibration" id="Pt7"></input>
+                  <input type="button" class="Calibration" id="Pt8"></input>
+                  <input type="button" class="Calibration" id="Pt9"></input>
+                </div>
+
+                <!-- Modal -->
+                <div id="helpModal" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                      <div class="modal-body">
+                        <img src="helpmodalimg.png" class="img-responsive">
+
+                      </div>
+                      <div class="modal-footer">
+                        <button id="closeBtn" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="_s.start_camera()">Start Camera</button>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+
+
+              <div class="slide" id="sound_test">
+
+                <div class="text-center">
+                  Press the play button to make sure you can hear the audio clip, and adjust the volume as necessary.  You won't be able to complete the task satisfactorily if you can't hear the audio.
+                  <br>
+                  In the task, the audio will play automatically, and you'll only hear it once - so listen carefully!
+                  <br>
+                  <br>
+                  <audio id="soundtest" controls src='soundtest.mp3'> </audio>
+                  <br>
+                  <br>
+                  <button id = "soundtest_OK" onclick="_s.soundtest_OK()"> Click here if you can hear the audio clearly. </button> </p>
+                </div>
+              </div>
+
+
+
+              <div class="slide" id="single_trial">
+                <div class="text-center">
+                  <audio id="aud" controls autoplay> </audio>
+                </div>
+                <div class ="imgwrapper" id="imgwrapper">
+                </div>
+                <br>
+                <div class="text-center">
+                  <button id = "continue_button" onclick="_s.continue()" style="width:100px; height:30px"> Continue </button> </p>
+                  <button id = "next_button" onclick="_s.next_trial()" style="width:50px; height:30px"> Next </button> </p>
+                  <p class="err"><font color="red">Please select a person </font></p>
+                </div>
+              </div>
+
+
+
+              <div class="slide"  id="subj_info">
+                <div class="text-center">
+                  <p class="subj_info_title">Please answer the brief questions below.</p>
+                  <br>
+                  <div class="subj_info_title">About you</div>
+
+                  <p>First Language(s) (the language(s) you spoke at home as a child): <input type="text" id="language"/> </p>
+
+                  <p>Gender:
+                    <select id="gender">
+                      <label><option value=""/></label>
+                      <label><option value="Male"/>Male</label>
+                      <label><option value="Female"/>Female</label>
+                      <label><option value="Other"/>Other</label>
+                    </select>
+                  </p>
+
+                  <p>Age: <input type="text" id="participantage"/></p>
+
+                  <br>
+                  <div class="subj_info_title">About the task </div>
+
+                  <p>Do you need to wear glasses (or contact lenses) to correct your vision?:
+                    <select id="eyesight">
+                      <label><option value="-1"/></label>
+                      <label><option value="none"/>No</label>
+                      <label><option value="nearsighted"/>Yes, I'm nearsighted (can't see well far away)</label>
+                      <label><option value="farsighted"/>Yes, I'm farsighted (can't see well close up)</label>
+                    </select>
+                  </p>
+                  <p>During the task, were you wearing glasses or contact lenses?:
+                    <select id="eyesight_task">
+                      <label><option value="-1"/></label>
+                      <label><option value="neither"/>No, neither</label>
+                      <label><option value="glasses"/>Glasses</label>
+                      <label><option value="contacts"/>Contact lenses</label>
+                    </select>
+                  </p>
+
+                  <p>(Optional) Do you have any comments about the HIT (any problems, etc.) ? </p>
+                  <textarea id="comments" rows="3" cols="50"></textarea>
+                  <br/>
+                  <p class="err_part2"><font color="red">Please complete all non-optional questions! </font></p>
+                  <br>
+                  <button onclick="_s.submit()"> Finish </button>
+                </div>
+              </div>
+
+
+              <div id="thanks" class="slide js" >
+                <p  class="big">Thanks for your time!</p>
+              </div>
+
+            </body>
+            </html>
