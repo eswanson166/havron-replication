@@ -1,5 +1,4 @@
 
-
 function make_slides(f) {
   var   slides = {};
 
@@ -184,8 +183,8 @@ function init_explogic() {
   BUTTON_HEIGHT = 30;
   CTE_BUTTON_WIDTH = 100;
   NXT_BUTTON_WIDTH = 50;
-  IMG_HEIGHT = 500;
-  IMG_WIDTH = 167;
+  IMG_HEIGHT = 226;
+  IMG_WIDTH = 400;
 
   //Initialize data frames
   exp.accuracy_attempts = [];
@@ -232,8 +231,8 @@ function init_explogic() {
       img_td.style.width = cellwidth+'px';
 
       var img_fname = img_fnames[descriptor_name][i]
-      var img = document.createElement('img');
-      img.src = 'static/imgs/'+img_fname+'.png';
+      var img = document.createElement('video');
+      img.src = 'static/imgs/'+img_fname+'.mov';
       img.id = img_fname;
 
       // place images at L and R
