@@ -1,4 +1,4 @@
-var img_fnames = {
+var vid_fnames = {
 "ball": ["Event_ball_noun", "Event_ball_verb"],
 "car" : ["Event_car_noun", "Event_car_verb"],
 "chicken" : ["Event_chicken_noun", "Event_chicken_verb"],

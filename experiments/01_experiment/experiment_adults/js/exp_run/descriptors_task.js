@@ -56,7 +56,7 @@ function make_slides(f) {
       exp.trial_no += 1;
       $("#aud").hide();
       descriptor_name = descriptor.item
-      exp.display_imgs(); // get imgs, show them
+      exp.display_vids(); // get imgs, show them
 
       // get data from webgazer
       webgazer.resume();
@@ -97,7 +97,7 @@ function make_slides(f) {
     continue : function(e){
       exp.endPreview = true
       exp.endPreviewTime = Date.now()
-      $("#img_table tr").show();
+      $("#vid_table tr").show();
       $("#continue_button").hide();
       var aud = $("#aud").attr("src", 'static/audio/wav/'+descriptor_name+".wav")[0];
       // get audio duration:
@@ -110,8 +110,8 @@ function make_slides(f) {
       exp.data_trials.push({
         "descriptor" : descriptor_name,
         "selected_img" : exp.clicked,
-        'left_choice' : img_fnames[descriptor_name][0],
-        'right_choice' : img_fnames[descriptor_name][1],
+        'left_choice' : vid_fnames[descriptor_name][0],
+        'right_choice' : vid_fnames[descriptor_name][1],
         "start_time" : _s.trial_start,
         "rt" : Date.now() - _s.trial_start,
         "current_windowW" : window.innerWidth,
@@ -196,7 +196,7 @@ function init_explogic() {
   exp.descriptors = _.shuffle(descriptors)   // shuffle list of descriptors
 
   //create experiment order/make slides
-  exp.structure=["i0",  "training_and_calibration", "sound_test", "single_trial",  "subj_info", "thanks"];
+  exp.structure=[/*"i0",  "training_and_calibration", "sound_test", */"single_trial",  "subj_info", "thanks"];
   exp.slides = make_slides(exp);
   exp.nQs = utils.get_exp_length();
 
@@ -213,9 +213,9 @@ function init_explogic() {
 
 
   // EXPERIMENT FUNCTIONS
-  exp.display_imgs = function(){
-    if (document.getElementById("img_table") != null){
-      $("#img_table tr").remove();
+  exp.display_vids = function(){
+    if (document.getElementById("vid_table") != null){
+      $("#vid_table tr").remove();
     }
     var table = document.createElement("table");
     var tr = document.createElement('tr');
@@ -225,32 +225,42 @@ function init_explogic() {
     $("#next_button").offset({top: (window.innerHeight/2)-(BUTTON_HEIGHT/2), left: (window.innerWidth/2)-(NXT_BUTTON_WIDTH/2)})
 
 
+    // DO THIS WITH PREVIEW VIDEOS, THEN ACTUAL VIDEOS.
     // create table with img elements on L and R side. show these for 2 seconds (as a 'preview') and then show the Continue button to play audio
     for (i = 0; i < NUM_COLS; i++) {
-      var img_td = document.createElement('td');
-      img_td.style.width = cellwidth+'px';
+      var vid_td = document.createElement('td');
+      vid_td.style.width = cellwidth+'px';
 
-      var img_fname = img_fnames[descriptor_name][i]
-      var img = document.createElement('video');
-      img.src = 'static/imgs/'+img_fname+'.mov';
-      img.id = img_fname;
+      var vid_fname = vid_fnames[descriptor_name][i]
+      var vid = document.createElement('video');
+      vid.src = 'static/videos/'+vid_fname+'.mov';
+      vid.id = vid_fname;
+      vid.type = 'video/mov';
+      vid.autoplay = true // DOES NOT WORK
+      vid.muted = true
+      vid.height = IMG_HEIGHT;
+      vid.width = IMG_WIDTH;
 
       // place images at L and R
-      if (img.id == img_fnames[descriptor_name][0]){
-        img.style.marginRight = (cellwidth - IMG_WIDTH)  + 'px';
+      if (vid.id == vid_fnames[descriptor_name][0]){
+        vid.style.marginRight = (cellwidth - IMG_WIDTH)  + 'px';
       } else {
-        img.style.marginLeft = (cellwidth - IMG_WIDTH)  + 'px';
-        console.log('img.style.marginLeft = ' + img.style.marginLeft)
+        vid.style.marginLeft = (cellwidth - IMG_WIDTH)  + 'px';
+        console.log('vid.style.marginLeft = ' + vid.style.marginLeft)
       }
+      
+      // WILL HAVE TO GET CONTINUE BUTTON TO WORK
       // show continue button after preview
-      setTimeout(function(){
-        $("#img_table tr").hide();
+      /*setTimeout(function(){
+        $("#vid_table tr").hide();
         $("#continue_button").offset({top: (window.innerHeight/2)-(BUTTON_HEIGHT/2), left: (window.innerWidth/2)-(CTE_BUTTON_WIDTH/2)})
-        $("#continue_button").show(); }, 2000); // preview imgs for 2 secs
+        if (document.getElementById('video').ended == true){
+        //  $("#continue_button").show();
+        $("#continue_button").show(); }, 2000); // preview imgs for 2 secs*/
 
         // HANDLING SELECTION
         // highlight selection in red, pause webgazer, disaplay selection for 1s before clearing
-        img.onclick = function(){
+        vid.onclick = function(){
           var id = $(this).attr("id");
           if (document.getElementById("aud").ended & exp.endPreview == true){
           exp.clicked = id;
@@ -261,15 +271,15 @@ function init_explogic() {
           in terms of analysis, this doesn't matter too much as there's always going to be enough padding around the central button area that the difference is negligble.
           But it's annoying, and I can't figure out why it's happening.  If you find the bug and fix it please tell me your secrets! */
           setTimeout(function(){
-            $("#img_table tr").remove();
+            $("#vid_table tr").remove();
             $("#next_button").show(); }, 1000);
           }
         };
 
-      img_td.appendChild(img);
-      tr.appendChild(img_td);
+      vid_td.appendChild(vid);
+      tr.appendChild(vid_td);
     }
-    table.setAttribute('id', 'img_table')
+    table.setAttribute('id', 'vid_table');
     table.appendChild(tr);
     document.getElementById("imgwrapper").appendChild(table);
   };
