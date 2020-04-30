@@ -56,7 +56,7 @@ function make_slides(f) {
       exp.trial_no += 1;
       $("#aud").hide();
       descriptor_name = descriptor.item
-      exp.display_vids(); // get imgs, show them
+      exp.display_videos(); // show videos
 
       // get data from webgazer
       webgazer.resume();
@@ -80,8 +80,8 @@ function make_slides(f) {
 
     next_trial : function(e){
       if (exp.clicked == null ) {
-        $(".err").show();
-      } else {
+      //  $(".err").show();
+      //} else {
         $(".err").hide();
         exp.keep_going = false;
         this.log_responses();
@@ -94,7 +94,7 @@ function make_slides(f) {
       }
     },
 
-    continue : function(e){
+    /*continue : function(e){
       exp.endPreview = true
       exp.endPreviewTime = Date.now()
       $("#vid_table tr").show();
@@ -104,7 +104,7 @@ function make_slides(f) {
       aud.onloadedmetadata = function() {
         aud_dur = aud.duration;
       };
-      },
+      },*/
 
     log_responses : function (){
       exp.data_trials.push({
@@ -183,8 +183,8 @@ function init_explogic() {
   BUTTON_HEIGHT = 30;
   CTE_BUTTON_WIDTH = 100;
   NXT_BUTTON_WIDTH = 50;
-  IMG_HEIGHT = 226;
-  IMG_WIDTH = 400;
+  VID_HEIGHT = 226;
+  VID_WIDTH = 400;
 
   //Initialize data frames
   exp.accuracy_attempts = [];
@@ -207,60 +207,64 @@ function init_explogic() {
     screenW: screen.width,
     windowH: window.innerHeight,
     windowW: window.innerWidth,
-    imageH: IMG_HEIGHT,
-    imageW: IMG_WIDTH
+    imageH: VID_HEIGHT,
+    imageW: VID_WIDTH
   };
 
 
   // EXPERIMENT FUNCTIONS
-  exp.display_vids = function(){
+  exp.display_videos = function(){
+
+    // PREVIEW VIDEOS: ONE, THEN THE OTHER
     if (document.getElementById("vid_table") != null){
       $("#vid_table tr").remove();
     }
-    var table = document.createElement("table");
-    var tr = document.createElement('tr');
+    var table_pre = document.createElement("table");
+    var tr_pre = document.createElement('tr');
 
     var cellwidth = MIN_WINDOW_WIDTH/NUM_COLS
     $("#continue_button").offset({top: (window.innerHeight/2)-(BUTTON_HEIGHT/2), left: (window.innerWidth/2)-(CTE_BUTTON_WIDTH/2)})
     $("#next_button").offset({top: (window.innerHeight/2)-(BUTTON_HEIGHT/2), left: (window.innerWidth/2)-(NXT_BUTTON_WIDTH/2)})
 
+    // first video
+    var vid1_td = document.createElement('td');
+      vid1_td.style.width = cellwidth+'px';
 
-    // DO THIS WITH PREVIEW VIDEOS, THEN ACTUAL VIDEOS.
-    // create table with img elements on L and R side. show these for 2 seconds (as a 'preview') and then show the Continue button to play audio
-    for (i = 0; i < NUM_COLS; i++) {
-      var vid_td = document.createElement('td');
-      vid_td.style.width = cellwidth+'px';
+      var vid1_fname = vid_fnames[descriptor_name][0];
+      var vid1_pre = document.createElement('video');
+      vid1_pre.src = 'static/videos/preview_'+vid1_fname+'.mov';
+      vid1_pre.id = vid1_fname;
+      console.log(vid1_pre.id);
+      vid1_pre.autoplay = true
+      vid1_pre.muted = true
+      vid1_pre.height = VID_HEIGHT;
+      vid1_pre.width = VID_WIDTH;
+      vid1_pre.style.marginRight = (cellwidth - VID_WIDTH)  + 'px';
 
-      var vid_fname = vid_fnames[descriptor_name][i]
-      var vid = document.createElement('video');
-      vid.src = 'static/videos/'+vid_fname+'.mov';
-      vid.id = vid_fname;
-      vid.type = 'video/mov';
-      vid.autoplay = true // DOES NOT WORK
-      vid.muted = true
-      vid.height = IMG_HEIGHT;
-      vid.width = IMG_WIDTH;
+    // second video
+    var vid2_td = document.createElement('td');
+      vid2_td.style.width = cellwidth+'px';
 
-      // place images at L and R
-      if (vid.id == vid_fnames[descriptor_name][0]){
-        vid.style.marginRight = (cellwidth - IMG_WIDTH)  + 'px';
-      } else {
-        vid.style.marginLeft = (cellwidth - IMG_WIDTH)  + 'px';
-        console.log('vid.style.marginLeft = ' + vid.style.marginLeft)
-      }
-      
-      // WILL HAVE TO GET CONTINUE BUTTON TO WORK
-      // show continue button after preview
-      /*setTimeout(function(){
-        $("#vid_table tr").hide();
-        $("#continue_button").offset({top: (window.innerHeight/2)-(BUTTON_HEIGHT/2), left: (window.innerWidth/2)-(CTE_BUTTON_WIDTH/2)})
-        if (document.getElementById('video').ended == true){
-        //  $("#continue_button").show();
-        $("#continue_button").show(); }, 2000); // preview imgs for 2 secs*/
+      var vid2_fname = vid_fnames[descriptor_name][1];
+      var vid2_pre = document.createElement('video');
+      vid2_pre.src = 'static/videos/preview_'+vid2_fname+'.mov';
+      vid2_pre.id = vid2_fname;
+      console.log(vid2_pre.id);
+      vid2_pre.muted = true
+      vid2_pre.height = VID_HEIGHT;
+      vid2_pre.width = VID_WIDTH;
+      vid2_pre.style.marginLeft = (cellwidth - VID_WIDTH)  + 'px';
+
+    //document.getElementById(vid2_fname).style.display = 'none';  
+    //$("#vid2_pre").hide();
+    /*$("#continue_button").hide();
+    vid1_pre.addEventListener('ended', function(){
+      $("#continue_button").show();
+    })*/
 
         // HANDLING SELECTION
         // highlight selection in red, pause webgazer, disaplay selection for 1s before clearing
-        vid.onclick = function(){
+        /*vid1_pre.onclick = function(){
           var id = $(this).attr("id");
           if (document.getElementById("aud").ended & exp.endPreview == true){
           exp.clicked = id;
@@ -270,21 +274,148 @@ function init_explogic() {
           /** NB there's a tiny bug s.t. the first time the Next button appears, it's slightly off center vertically.
           in terms of analysis, this doesn't matter too much as there's always going to be enough padding around the central button area that the difference is negligble.
           But it's annoying, and I can't figure out why it's happening.  If you find the bug and fix it please tell me your secrets! */
-          setTimeout(function(){
+          /*setTimeout(function(){
             $("#vid_table tr").remove();
             $("#next_button").show(); }, 1000);
           }
-        };
+        };*/
 
-      vid_td.appendChild(vid);
-      tr.appendChild(vid_td);
-    }
-    table.setAttribute('id', 'vid_table');
-    table.appendChild(tr);
-    document.getElementById("imgwrapper").appendChild(table);
+      vid1_td.appendChild(vid1_pre);
+      vid2_td.appendChild(vid2_pre);
+      tr_pre.appendChild(vid1_td);
+      tr_pre.appendChild(vid2_td);
+    //}
+    table_pre.setAttribute('id', 'vid_table');
+    table_pre.appendChild(tr_pre);
+    document.getElementById("imgwrapper").appendChild(table_pre);
+
+    // hide second video until first video is done playing
+    vid2_pre.style.visibility = 'hidden'; // works for now
+    $("#continue_button").hide();
+    vid1_pre.addEventListener('ended', function(){
+      vid1_pre.style.visibility = 'hidden';
+      vid2_pre.style.visibility = 'visible';
+      vid2_pre.play();
+    })
+
+    // make second video disappear after playing (MIGHT NEED THIS LATER!)
+    /*vid2_pre.addEventListener('ended', function(){
+      vid2_pre.style.visibility = 'hidden';
+    })*/ 
+
+    /* set fixation point (TODO: WHAT IS FIXATION POINT?)
+    setTimeout(function(){
+      vid1_pre.style.visibility = 'visible';}, 1000);*/
+
+
+    //  CONTRAST: BOTH VIDEOS AT ONCE
+    vid2_pre.addEventListener('ended', function(){
+      if (document.getElementById("vid_table") != null){
+        $("#vid_table tr").remove();
+      }
+      var table_con = document.createElement("table");
+      var tr_con = document.createElement('tr');
+
+      var cellwidth = MIN_WINDOW_WIDTH/NUM_COLS
+  
+      // first video
+      var vid1_td = document.createElement('td');
+      vid1_td.style.width = cellwidth+'px';
+
+      var vid1_fname = vid_fnames[descriptor_name][0];
+      var vid1_con = document.createElement('video');
+      vid1_con.src = 'static/videos/contrast_'+vid1_fname+'.mov';
+      vid1_con.id = vid1_fname;
+      console.log(vid1_con.id);
+      vid1_con.autoplay = true;
+      vid1_con.muted = true;
+      vid1_con.height = VID_HEIGHT;
+      vid1_con.width = VID_WIDTH;
+      vid1_con.style.marginRight = (cellwidth - VID_WIDTH)  + 'px';
+
+    // second video
+      var vid2_td = document.createElement('td');
+        vid2_td.style.width = cellwidth+'px';
+
+      var vid2_fname = vid_fnames[descriptor_name][1];
+      var vid2_con = document.createElement('video');
+      vid2_con.src = 'static/videos/contrast_'+vid2_fname+'.mov';
+      vid2_con.id = vid2_fname;
+      console.log(vid2_con.id);
+      vid2_con.autoplay = true;
+      vid2_con.muted = true;
+      vid2_con.height = VID_HEIGHT;
+      vid2_con.width = VID_WIDTH;
+      vid2_con.style.marginLeft = (cellwidth - VID_WIDTH)  + 'px';
+
+      vid1_td.appendChild(vid1_con);
+      vid2_td.appendChild(vid2_con);
+      tr_con.appendChild(vid1_td);
+      tr_con.appendChild(vid2_td);
+
+      table_con.setAttribute('id', 'vid_table');
+      table_con.appendChild(tr_con);
+      document.getElementById("imgwrapper").appendChild(table_con);
+
+
+      // EVENT: BOTH VIDEOS AT ONCE
+      vid2_con.addEventListener('ended', function(){
+      if (document.getElementById("vid_table") != null){
+        $("#vid_table tr").remove();
+      }
+      var table_ev = document.createElement("table");
+      var tr_ev = document.createElement('tr');
+
+      var cellwidth = MIN_WINDOW_WIDTH/NUM_COLS
+     
+      // first video
+      var vid1_td = document.createElement('td');
+        vid1_td.style.width = cellwidth+'px';
+
+      var vid1_fname = vid_fnames[descriptor_name][0];
+      var vid1_ev = document.createElement('video');
+      vid1_ev.src = 'static/videos/Event_'+vid1_fname+'.mov';
+      vid1_ev.id = vid1_fname;
+      console.log(vid1_ev.id);
+      vid1_ev.autoplay = true;
+      vid1_ev.muted = true;
+      vid1_ev.height = VID_HEIGHT;
+      vid1_ev.width = VID_WIDTH;
+      vid1_ev.style.marginRight = (cellwidth - VID_WIDTH)  + 'px';
+
+    // second video
+      var vid2_td = document.createElement('td');
+        vid2_td.style.width = cellwidth+'px';
+
+      var vid2_fname = vid_fnames[descriptor_name][1];
+      var vid2_ev = document.createElement('video');
+      vid2_ev.src = 'static/videos/Event_'+vid2_fname+'.mov';
+      vid2_ev.id = vid2_fname;
+      console.log(vid2_ev.id);
+      vid2_ev.autoplay = true;
+      vid2_ev.muted = true;
+      vid2_ev.height = VID_HEIGHT;
+      vid2_ev.width = VID_WIDTH;
+      vid2_ev.style.marginLeft = (cellwidth - VID_WIDTH)  + 'px';
+
+      vid1_td.appendChild(vid1_ev);
+      vid2_td.appendChild(vid2_ev);
+      tr_ev.appendChild(vid1_td);
+      tr_ev.appendChild(vid2_td);
+
+      table_ev.setAttribute('id', 'vid_table');
+      table_ev.appendChild(tr_ev);
+      document.getElementById("imgwrapper").appendChild(table_ev);
+
+      // when the event videos are over, add in a next button
+      vid2_ev.addEventListener('ended', function(){
+        setTimeout(function(){
+        $("#img_table tr").remove();
+        $("#next_button").show(); }, 1000);
+        });
+      });
+    });
   };
-
-
 
 
   // EXPERIMENT RUN
