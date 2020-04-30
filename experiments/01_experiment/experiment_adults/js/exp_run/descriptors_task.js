@@ -79,19 +79,19 @@ function make_slides(f) {
     },
 
     next_trial : function(e){
-      if (exp.clicked == null ) {
+      //if (exp.clicked == null ) {
       //  $(".err").show();
       //} else {
-        $(".err").hide();
+        //$(".err").hide();
         exp.keep_going = false;
         this.log_responses();
         _stream.apply(this);
         exp.tlist = [];
         exp.xlist = [];
         exp.ylist = [];
-        exp.clicked = null;
-        exp.endPreview = false;
-      }
+        //exp.clicked = null;
+        //exp.endPreview = false;
+      //}
     },
 
     /*continue : function(e){
@@ -109,7 +109,7 @@ function make_slides(f) {
     log_responses : function (){
       exp.data_trials.push({
         "descriptor" : descriptor_name,
-        "selected_img" : exp.clicked,
+        //"selected_img" : exp.clicked,
         'left_choice' : vid_fnames[descriptor_name][0],
         'right_choice' : vid_fnames[descriptor_name][1],
         "start_time" : _s.trial_start,
@@ -117,7 +117,7 @@ function make_slides(f) {
         "current_windowW" : window.innerWidth,
         "current_windowH" : window.innerHeight,
         "endPreviewTime" : exp.endPreviewTime,
-        "aud_duration" : aud_dur,
+        //"aud_duration" : aud_dur,
         "trial_no" : exp.trial_no,
         'time' : exp.tlist,
         'x' : exp.xlist,
@@ -196,7 +196,7 @@ function init_explogic() {
   exp.descriptors = _.shuffle(descriptors)   // shuffle list of descriptors
 
   //create experiment order/make slides
-  exp.structure=[/*"i0",  "training_and_calibration", "sound_test", */"single_trial",  "subj_info", "thanks"];
+  exp.structure=[/*"i0",  "training_and_calibration", */"sound_test", "single_trial",  "subj_info", "thanks"];
   exp.slides = make_slides(exp);
   exp.nQs = utils.get_exp_length();
 
@@ -215,7 +215,7 @@ function init_explogic() {
   // EXPERIMENT FUNCTIONS
   exp.display_videos = function(){
 
-    // PREVIEW VIDEOS: ONE, THEN THE OTHER
+    /////////// PREVIEW VIDEOS: ONE, THEN THE OTHER \\\\\\\\\\\
     if (document.getElementById("vid_table") != null){
       $("#vid_table tr").remove();
     }
@@ -236,7 +236,6 @@ function init_explogic() {
       vid1_pre.id = vid1_fname;
       console.log(vid1_pre.id);
       vid1_pre.autoplay = true
-      vid1_pre.muted = true
       vid1_pre.height = VID_HEIGHT;
       vid1_pre.width = VID_WIDTH;
       vid1_pre.style.marginRight = (cellwidth - VID_WIDTH)  + 'px';
@@ -250,36 +249,11 @@ function init_explogic() {
       vid2_pre.src = 'static/videos/preview_'+vid2_fname+'.mov';
       vid2_pre.id = vid2_fname;
       console.log(vid2_pre.id);
-      vid2_pre.muted = true
       vid2_pre.height = VID_HEIGHT;
       vid2_pre.width = VID_WIDTH;
       vid2_pre.style.marginLeft = (cellwidth - VID_WIDTH)  + 'px';
 
-    //document.getElementById(vid2_fname).style.display = 'none';  
-    //$("#vid2_pre").hide();
-    /*$("#continue_button").hide();
-    vid1_pre.addEventListener('ended', function(){
-      $("#continue_button").show();
-    })*/
-
-        // HANDLING SELECTION
-        // highlight selection in red, pause webgazer, disaplay selection for 1s before clearing
-        /*vid1_pre.onclick = function(){
-          var id = $(this).attr("id");
-          if (document.getElementById("aud").ended & exp.endPreview == true){
-          exp.clicked = id;
-          $(this).css("border","2px solid red");
-          webgazer.pause();
-          // next button appears after 1s to continue to next trial.
-          /** NB there's a tiny bug s.t. the first time the Next button appears, it's slightly off center vertically.
-          in terms of analysis, this doesn't matter too much as there's always going to be enough padding around the central button area that the difference is negligble.
-          But it's annoying, and I can't figure out why it's happening.  If you find the bug and fix it please tell me your secrets! */
-          /*setTimeout(function(){
-            $("#vid_table tr").remove();
-            $("#next_button").show(); }, 1000);
-          }
-        };*/
-
+      // create table with videos
       vid1_td.appendChild(vid1_pre);
       vid2_td.appendChild(vid2_pre);
       tr_pre.appendChild(vid1_td);
@@ -298,17 +272,12 @@ function init_explogic() {
       vid2_pre.play();
     })
 
-    // make second video disappear after playing (MIGHT NEED THIS LATER!)
-    /*vid2_pre.addEventListener('ended', function(){
-      vid2_pre.style.visibility = 'hidden';
-    })*/ 
-
     /* set fixation point (TODO: WHAT IS FIXATION POINT?)
     setTimeout(function(){
       vid1_pre.style.visibility = 'visible';}, 1000);*/
 
 
-    //  CONTRAST: BOTH VIDEOS AT ONCE
+    ///////////// CONTRAST: BOTH VIDEOS AT ONCE \\\\\\\\\\\\\\
     vid2_pre.addEventListener('ended', function(){
       if (document.getElementById("vid_table") != null){
         $("#vid_table tr").remove();
@@ -328,7 +297,6 @@ function init_explogic() {
       vid1_con.id = vid1_fname;
       console.log(vid1_con.id);
       vid1_con.autoplay = true;
-      vid1_con.muted = true;
       vid1_con.height = VID_HEIGHT;
       vid1_con.width = VID_WIDTH;
       vid1_con.style.marginRight = (cellwidth - VID_WIDTH)  + 'px';
@@ -343,11 +311,11 @@ function init_explogic() {
       vid2_con.id = vid2_fname;
       console.log(vid2_con.id);
       vid2_con.autoplay = true;
-      vid2_con.muted = true;
       vid2_con.height = VID_HEIGHT;
       vid2_con.width = VID_WIDTH;
       vid2_con.style.marginLeft = (cellwidth - VID_WIDTH)  + 'px';
 
+      // create table with videos
       vid1_td.appendChild(vid1_con);
       vid2_td.appendChild(vid2_con);
       tr_con.appendChild(vid1_td);
@@ -358,7 +326,7 @@ function init_explogic() {
       document.getElementById("imgwrapper").appendChild(table_con);
 
 
-      // EVENT: BOTH VIDEOS AT ONCE
+      ///////////// EVENT: BOTH VIDEOS AT ONCE \\\\\\\\\\\\\\\
       vid2_con.addEventListener('ended', function(){
       if (document.getElementById("vid_table") != null){
         $("#vid_table tr").remove();
@@ -378,7 +346,6 @@ function init_explogic() {
       vid1_ev.id = vid1_fname;
       console.log(vid1_ev.id);
       vid1_ev.autoplay = true;
-      vid1_ev.muted = true;
       vid1_ev.height = VID_HEIGHT;
       vid1_ev.width = VID_WIDTH;
       vid1_ev.style.marginRight = (cellwidth - VID_WIDTH)  + 'px';
@@ -393,11 +360,11 @@ function init_explogic() {
       vid2_ev.id = vid2_fname;
       console.log(vid2_ev.id);
       vid2_ev.autoplay = true;
-      vid2_ev.muted = true;
       vid2_ev.height = VID_HEIGHT;
       vid2_ev.width = VID_WIDTH;
       vid2_ev.style.marginLeft = (cellwidth - VID_WIDTH)  + 'px';
 
+      // create table with videos
       vid1_td.appendChild(vid1_ev);
       vid2_td.appendChild(vid2_ev);
       tr_ev.appendChild(vid1_td);
