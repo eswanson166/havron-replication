@@ -10,5 +10,9 @@ var vid_fnames = {
 "sleep": ["sleep_noun", "sleep_verb"],
 "write": ["write_noun", "write_verb"],
 "draw": ["draw_noun", "draw_verb"],
-"jump": ["jump_noun", "jump_verb"]
+"jump": ["jump_noun", "jump_verb"],
+"bamoule": ["bamoule_noun", "bamoule_verb"],
+"daze": ["daze_noun", "daze_verb"],
+"nuve": ["nuve_noun", "nuve_verb"],
+"pirdal": ["pirdal_noun", "pirdal_verb"]
 }

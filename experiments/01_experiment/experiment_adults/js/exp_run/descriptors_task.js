@@ -55,8 +55,11 @@ function make_slides(f) {
       this.trial_start = Date.now();
       exp.trial_no += 1;
       $("#aud").hide();
-      descriptor_name = descriptor.item
-      exp.display_videos(); // show videos
+      descriptor_name = descriptor.item;
+      descriptor_fnames = _.shuffle(vid_fnames[descriptor_name])
+      vid1_fname = descriptor_fnames[0]
+      vid2_fname = descriptor_fnames[1]
+      exp.play_videos(); // show videos
 
       // get data from webgazer
       webgazer.resume();
@@ -79,46 +82,34 @@ function make_slides(f) {
     },
 
     next_trial : function(e){
-      //if (exp.clicked == null ) {
-      //  $(".err").show();
-      //} else {
-        //$(".err").hide();
         exp.keep_going = false;
         this.log_responses();
+        console.log(exp.data_trials)
         _stream.apply(this);
         exp.tlist = [];
         exp.xlist = [];
         exp.ylist = [];
-        //exp.clicked = null;
-        //exp.endPreview = false;
-      //}
     },
-
-    /*continue : function(e){
-      exp.endPreview = true
-      exp.endPreviewTime = Date.now()
-      $("#vid_table tr").show();
-      $("#continue_button").hide();
-      var aud = $("#aud").attr("src", 'static/audio/wav/'+descriptor_name+".wav")[0];
-      // get audio duration:
-      aud.onloadedmetadata = function() {
-        aud_dur = aud.duration;
-      };
-      },*/
 
     log_responses : function (){
       exp.data_trials.push({
         "condition": exp.condition,
         "descriptor" : descriptor_name,
-        //"selected_img" : exp.clicked,
-        'left_video' : exp.display_videos.vid1_fname,
-        'right_video' : exp.display_videos.vid2_fname,
+        'left_video' : vid1_fname,
+        'right_video' : vid2_fname,
         "start_time" : _s.trial_start,
-        "rt" : Date.now() - _s.trial_start,
         "current_windowW" : window.innerWidth,
         "current_windowH" : window.innerHeight,
-        "endPreviewTime" : exp.endPreviewTime,
-        //"aud_duration" : aud_dur,
+        "end_pre1_time" : exp.end_pre1_time,
+        "pre1_duration" : exp.end_pre1_time - _s.trial_start,
+        "end_pre2_time" : exp.end_pre2_time,
+        "pre2_duration" : exp.end_pre2_time - exp.end_pre1_time,
+        "end_contrast_time" : exp.end_contrast_time,
+        "contrast_duration" : exp.end_contrast_time - exp.end_pre2_time,
+        "end_audio_time" : exp.end_audio_time,
+        "audio_duration" : exp.end_audio_time - exp.end_contrast_time,
+        "end_event_time" : exp.end_event_time,
+        "event_duration": exp.end_event_time - exp.end_contrast_time,
         "trial_no" : exp.trial_no,
         'time' : exp.tlist,
         'x' : exp.xlist,
@@ -188,23 +179,55 @@ function init_explogic() {
   VID_HEIGHT = 226;
   VID_WIDTH = 400;
 
-  //Initialize data frames // FIGURE OUT
+  //Initialize data frames
   exp.accuracy_attempts = [];
   exp.data_trials = [];
   exp.tlist = []; //TESTING
   exp.xlist = [];
   exp.ylist = [];
   exp.clicked = null;
+  exp.train_descriptors = [];
+  exp.filler_descriptors = []
+  exp.test_descriptors = [];
+  exp.gen_descriptors = []
   exp.descriptors = [];
   exp.condition = _.sample(["noun", "verb"]);
   for (var i = 0; i<descriptors.length; i++){
     if (descriptors[i].condition == exp.condition)
-      exp.descriptors.push(descriptors[i]);
+      exp.train_descriptors.push(descriptors[i]);
+    else if (descriptors[i].condition == (exp.condition + "_filler"))
+      exp.filler_descriptors.push(descriptors[i]);
+    else if (descriptors[i].condition == "test")
+      exp.test_descriptors.push(descriptors[i]);
+    else if (descriptors[i].condition == "gen")
+      exp.gen_descriptors.push(descriptors[i]);
   }
-  exp.descriptors = _.shuffle(exp.descriptors);   // shuffle list of descriptors
+  // shuffle training, filler, and test descriptors
+  // if we had >1 generalize trial, we'd shuffle that too
+  exp.train_descriptors = _.shuffle(exp.train_descriptors);
+  exp.test_descriptors = _.shuffle(exp.test_descriptors);
+  exp.filler_descriptors = _.shuffle(exp.filler_descriptors); 
+  
+  // add training, then test, then generalize trials to exp.descriptors
+  for (var i = 0; i<(exp.train_descriptors.length/2); i++){
+    exp.descriptors.push(exp.train_descriptors[i]);
+  }
+  for (var i = 0; i<exp.filler_descriptors.length; i++){
+    exp.descriptors.push(exp.filler_descriptors[i]);
+  }
+  for (var i = (exp.train_descriptors.length/2); i<exp.train_descriptors.length; i++){
+    exp.descriptors.push(exp.train_descriptors[i]);
+  }
+  for (var i = 0; i<(exp.test_descriptors.length); i++){
+    exp.descriptors.push(exp.test_descriptors[i]);
+  }
+  for (var i = 0; i<(exp.gen_descriptors.length); i++){
+    exp.descriptors.push(exp.gen_descriptors[i]);
+  }
 
-  //create experiment order/make slides
-  exp.structure=[/*"i0",  "training_and_calibration", */"sound_test", "single_trial",  "subj_info", "thanks"];
+
+  //create experiment order and make slides
+  exp.structure=["i0",  "training_and_calibration", "sound_test", "single_trial",  "subj_info", "thanks"];
   exp.slides = make_slides(exp);
   exp.nQs = utils.get_exp_length();
 
@@ -221,9 +244,9 @@ function init_explogic() {
 
 
   // EXPERIMENT FUNCTIONS
-  exp.display_videos = function(){
+  exp.play_videos = function(){
 
-    /////////// PREVIEW VIDEOS: ONE, THEN THE OTHER \\\\\\\\\\\
+    ///////////////// PREVIEW VIDEOS: LEFT, THEN RIGHT \\\\\\\\\\\\\\\\\
     if (document.getElementById("vid_table") != null){
       $("#vid_table tr").remove();
     }
@@ -234,12 +257,6 @@ function init_explogic() {
     $("#continue_button").offset({top: (window.innerHeight/2)-(BUTTON_HEIGHT/2), left: (window.innerWidth/2)-(CTE_BUTTON_WIDTH/2)})
     $("#next_button").offset({top: (window.innerHeight/2)-(BUTTON_HEIGHT/2), left: (window.innerWidth/2)-(NXT_BUTTON_WIDTH/2)})
 
-
-    // determine which video will be first and which second
-    var descriptor_fnames = _.shuffle(vid_fnames[descriptor_name])
-    var vid1_fname = descriptor_fnames[0]
-    var vid2_fname = descriptor_fnames[1]
-
     // first video
     var vid1_td = document.createElement('td');
       vid1_td.style.width = cellwidth+'px';
@@ -247,8 +264,7 @@ function init_explogic() {
       //var vid1_fname = vid_fnames[descriptor_name][0];
       var vid1_pre = document.createElement('video');
       vid1_pre.src = 'static/videos/preview_'+vid1_fname+'.mov';
-      vid1_pre.id = vid1_fname;
-      console.log(vid1_pre.id);
+      vid1_pre.id = vid1_fname + '_pre';
       vid1_pre.autoplay = true
       vid1_pre.height = VID_HEIGHT;
       vid1_pre.width = VID_WIDTH;
@@ -261,8 +277,7 @@ function init_explogic() {
       //var vid2_fname = vid_fnames[descriptor_name][1];
       var vid2_pre = document.createElement('video');
       vid2_pre.src = 'static/videos/preview_'+vid2_fname+'.mov';
-      vid2_pre.id = vid2_fname;
-      console.log(vid2_pre.id);
+      vid2_pre.id = vid2_fname + '_pre';
       vid2_pre.height = VID_HEIGHT;
       vid2_pre.width = VID_WIDTH;
       vid2_pre.style.marginLeft = (cellwidth - VID_WIDTH)  + 'px';
@@ -281,6 +296,7 @@ function init_explogic() {
     vid2_pre.style.visibility = 'hidden'; // works for now
     $("#continue_button").hide();
     vid1_pre.addEventListener('ended', function(){
+      exp.end_pre1_time = Date.now()
       vid1_pre.style.visibility = 'hidden';
       vid2_pre.style.visibility = 'visible';
       vid2_pre.play();
@@ -291,8 +307,9 @@ function init_explogic() {
       vid1_pre.style.visibility = 'visible';}, 1000);*/
 
 
-    ///////////// CONTRAST: BOTH VIDEOS AT ONCE \\\\\\\\\\\\\\
+    //////////////////// CONTRAST: BOTH VIDEOS AT ONCE \\\\\\\\\\\\\\\\\\\
     vid2_pre.addEventListener('ended', function(){
+      exp.end_pre2_time = Date.now()
       if (document.getElementById("vid_table") != null){
         $("#vid_table tr").remove();
       }
@@ -308,7 +325,7 @@ function init_explogic() {
       //var vid1_fname = vid_fnames[descriptor_name][0];
       var vid1_con = document.createElement('video');
       vid1_con.src = 'static/videos/contrast_'+vid1_fname+'.mov';
-      vid1_con.id = vid1_fname;
+      vid1_con.id = vid1_fname + '_con';
       vid1_con.autoplay = true;
       vid1_con.height = VID_HEIGHT;
       vid1_con.width = VID_WIDTH;
@@ -321,7 +338,7 @@ function init_explogic() {
       //var vid2_fname = vid_fnames[descriptor_name][1];
       var vid2_con = document.createElement('video');
       vid2_con.src = 'static/videos/contrast_'+vid2_fname+'.mov';
-      vid2_con.id = vid2_fname;
+      vid2_con.id = vid2_fname + '_con';
       vid2_con.autoplay = true;
       vid2_con.height = VID_HEIGHT;
       vid2_con.width = VID_WIDTH;
@@ -338,57 +355,72 @@ function init_explogic() {
       document.getElementById("imgwrapper").appendChild(table_con);
 
 
-      ///////////// EVENT: BOTH VIDEOS AT ONCE \\\\\\\\\\\\\\\
+      ///////////////////// BLANK SCREEN: EVENT AUDIO \\\\\\\\\\\\\\\\\\\\
       vid2_con.addEventListener('ended', function(){
-      if (document.getElementById("vid_table") != null){
-        $("#vid_table tr").remove();
-      }
-      var table_ev = document.createElement("table");
-      var tr_ev = document.createElement('tr');
+        exp.end_contrast_time = Date.now()
+        if (document.getElementById("vid_table") != null){
+          $("#vid_table tr").remove();
+        }
 
-      var cellwidth = MIN_WINDOW_WIDTH/NUM_COLS
+        var blk_audio = document.createElement('audio');
+        blk_audio.src = 'static/audio/Black_' + descriptor_name + '_' + exp.condition +'.wav';
+        blk_audio.autoplay = true;
+
+
+        /////////////////// EVENT: BOTH VIDEOS AT ONCE \\\\\\\\\\\\\\\\\\\\
+        blk_audio.addEventListener('ended', function(){
+          exp.end_audio_time = Date.now()
+          if (document.getElementById("vid_table") != null){
+            $("#vid_table tr").remove();
+          }
+          var table_ev = document.createElement("table");
+          var tr_ev = document.createElement('tr');
+
+          var cellwidth = MIN_WINDOW_WIDTH/NUM_COLS
      
-      // first video
-      var vid1_td = document.createElement('td');
-        vid1_td.style.width = cellwidth+'px';
+          // first video
+          var vid1_td = document.createElement('td');
+            vid1_td.style.width = cellwidth+'px';
 
-      //var vid1_fname = vid_fnames[descriptor_name][0];
-      var vid1_ev = document.createElement('video');
-      vid1_ev.src = 'static/videos/Event_'+vid1_fname+'.mov';
-      vid1_ev.id = vid1_fname;
-      vid1_ev.autoplay = true;
-      vid1_ev.height = VID_HEIGHT;
-      vid1_ev.width = VID_WIDTH;
-      vid1_ev.style.marginRight = (cellwidth - VID_WIDTH)  + 'px';
+          //var vid1_fname = vid_fnames[descriptor_name][0];
+          var vid1_ev = document.createElement('video');
+          vid1_ev.src = 'static/videos/Event_'+vid1_fname+'.mov';
+          vid1_ev.id = vid1_fname + '_ev';
+          vid1_ev.autoplay = true;
+          vid1_ev.height = VID_HEIGHT;
+          vid1_ev.width = VID_WIDTH;
+          vid1_ev.style.marginRight = (cellwidth - VID_WIDTH)  + 'px';
 
-    // second video
-      var vid2_td = document.createElement('td');
-        vid2_td.style.width = cellwidth+'px';
+          // second video
+          var vid2_td = document.createElement('td');
+            vid2_td.style.width = cellwidth+'px';
 
-      //var vid2_fname = vid_fnames[descriptor_name][1];
-      var vid2_ev = document.createElement('video');
-      vid2_ev.src = 'static/videos/Event_'+vid2_fname+'.mov';
-      vid2_ev.id = vid2_fname;
-      vid2_ev.autoplay = true;
-      vid2_ev.height = VID_HEIGHT;
-      vid2_ev.width = VID_WIDTH;
-      vid2_ev.style.marginLeft = (cellwidth - VID_WIDTH)  + 'px';
+          //var vid2_fname = vid_fnames[descriptor_name][1];
+          var vid2_ev = document.createElement('video');
+          vid2_ev.src = 'static/videos/Event_'+vid2_fname+'.mov';
+          vid2_ev.id = vid2_fname + '_ev';
+          vid2_ev.autoplay = true;
+          vid2_ev.height = VID_HEIGHT;
+          vid2_ev.width = VID_WIDTH;
+          vid2_ev.style.marginLeft = (cellwidth - VID_WIDTH)  + 'px';
 
-      // create table with videos
-      vid1_td.appendChild(vid1_ev);
-      vid2_td.appendChild(vid2_ev);
-      tr_ev.appendChild(vid1_td);
-      tr_ev.appendChild(vid2_td);
+          // create table with videos
+          vid1_td.appendChild(vid1_ev);
+          vid2_td.appendChild(vid2_ev);
+          tr_ev.appendChild(vid1_td);
+          tr_ev.appendChild(vid2_td);
 
-      table_ev.setAttribute('id', 'vid_table');
-      table_ev.appendChild(tr_ev);
-      document.getElementById("imgwrapper").appendChild(table_ev);
+          table_ev.setAttribute('id', 'vid_table');
+          table_ev.appendChild(tr_ev);
+          document.getElementById("imgwrapper").appendChild(table_ev);
 
-      // when the event videos are over, add in a next button
-      vid2_ev.addEventListener('ended', function(){
-        setTimeout(function(){
-        $("#img_table tr").remove();
-        $("#next_button").show(); }, 1000);
+          // when the event videos are over, add in a next button
+          vid2_ev.addEventListener('ended', function(){
+            exp.end_event_time = Date.now()
+            setTimeout(function(){
+            $("#img_table tr").remove();
+            $("#next_button").show(); }, 100);
+          });
         });
       });
     });
