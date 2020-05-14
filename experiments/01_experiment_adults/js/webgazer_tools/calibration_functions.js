@@ -22,7 +22,7 @@ function PopUpInstruction(){
   ClearCanvas();
   swal({
     title:"Calibration",
-    text: "Please click on each of the 9 points on the screen. You must click on each point 5 times till it goes yellow. This will calibrate your eye movements.",
+    text: "Merci de cliquer sur chacun des 9 points sur votre écran. Vous devez cliquer chaque point 5 fois jusqu’à ce que la couleur devienne jaune. Cela calibrera vos mouvements oculaires.",
     buttons:{
       cancel: false,
       confirm: true
@@ -93,8 +93,8 @@ function doCalibration(){
 
             // notification for the measurement process
             swal({
-              title: "Calculating measurement",
-              text: "Please don't move your mouse & stare at the middle dot for the next 5 seconds. This will allow us to calculate the accuracy of our predictions.",
+              title: "Calculation des mesures",
+              text: "Merci de ne pas bouger votre souris et de regarder vers le point central pour les 5 prochaines secondes. Cela nous permettra de calculer la précision de nos prédictions.",
               closeOnEsc: false,
               allowOutsideClick: false,
               closeModal: true
@@ -110,14 +110,14 @@ function doCalibration(){
                       var past50 = get_points() // retrieve the stored points
                       precision_measurement = calculatePrecision(past50);
                       // var precision_measurement = calculatePrecision(past50);
-                      var accuracyLabel = "<a>Accuracy | "+precision_measurement+"%</a>";
+                      var accuracyLabel = "<a>Précision | "+precision_measurement+"%</a>";
                       $("#begin_task").show();
                       document.getElementById("Accuracy").innerHTML = accuracyLabel; // Show the accuracy in the nav bar.
                       swal({
-                        title: "Your accuracy measure is " + precision_measurement + "%",
+                        title: "Votre mesure de précision est: " + precision_measurement + "%",
                         allowOutsideClick: false,
                         buttons: {
-                          cancel: "Calibrate again",
+                          cancel: "Calibrer à nouveau",
                           confirm: true,
                         }
                       }).then(isConfirm => {

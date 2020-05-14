@@ -34,7 +34,7 @@ setTimeout(checkIfReady,100);
 }
 
 function Restart(){
-    document.getElementById("Accuracy").innerHTML = "<a>Not yet Calibrated</a>";
+    document.getElementById("Accuracy").innerHTML = "<a>Calibration incomplète </a>";
     ClearCalibration();
     PopUpInstruction();
     doCalibration();

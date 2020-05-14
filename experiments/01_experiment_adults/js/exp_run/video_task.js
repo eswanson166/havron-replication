@@ -28,8 +28,8 @@ function make_slides(f) {
       else {
         exp.accuracy_attempts.push(precision_measurement);
         swal({
-          title:"Calibration Fail",
-          text: "Either you haven't performed the calibration yet, or your calibration score is too low. Your calibration score must be 50% to begin the task. Please click Recalibrate to try calibrating again.",
+          title:"Échec de calibration",
+          text: "Soit vous n’avez pas encore effectué la calibration, soit vous n’avez pas atteint le score de calibration requis (50%). Cliquez sur 'Calibrer à nouveau' pour recommencer la calibration.",
           buttons:{
             cancel: false,
             confirm: true
@@ -84,7 +84,6 @@ function make_slides(f) {
     next_trial : function(e){
         exp.keep_going = false;
         this.log_responses();
-        console.log(exp.data_trials)
         _stream.apply(this);
         exp.tlist = [];
         exp.xlist = [];
@@ -227,7 +226,7 @@ function init_explogic() {
 
 
   //create experiment order and make slides
-  exp.structure=["i0",  "training_and_calibration", "sound_test", "single_trial", "subj_info", "thanks"];
+  exp.structure=[/*"i0",  "training_and_calibration", */"sound_test", "single_trial", "subj_info", "thanks"];
   exp.slides = make_slides(exp);
   exp.nQs = utils.get_exp_length();
 

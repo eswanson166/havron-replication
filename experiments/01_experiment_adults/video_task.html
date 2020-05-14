@@ -2,7 +2,7 @@
 <html>
 <head>
   <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
-    <title> Select the person described! </title>
+    <title> Regardez les vidéos! </title>
 
 
     <!--  general js utilities -->
@@ -58,17 +58,17 @@
 
 
 
-    <noscript>This task requires JavaScript.</noscript>
+    <noscript>Javascript doit être activé pour compléter cette tâche.</noscript>
     <div class="slide" id="i0" >
       <div class="text-center">
         <img src="eyes.png" alt="user" id="userpic"></img>
-        <p id="study_title"><b> Select the person described! </b></p>
+        <p id="study_title"><b> Regardez les vidéos! </b></p>
         <!-- <br> -->
 
         <div class="card bg-light mb-3">
           <div class="card-body">
-            <p class="card-text">In this task, you will see illustrated images of two people. You will hear an instruction to click on the person who fits the description - e.g., "Click on the person with glasses".
-              <br> Your task is to click on the person described. Note: you will see the images for two seconds before clicking Continue to proceed; the images will reappear as the audio instruction plays. </p>
+            <p class="card-text">Pour cette tâche, vous regarderez les vidéos présentées, pour une durée d’approximativement 10 minutes. Après chaque série de vidéos, vous cliquerez “Suivant” pour vous rendre vers la série suivante. 
+              <br> Essayez de regarder la vidéo qui est décrite par la narratrice. Cette étude ayant originellement été faite pour des enfants, certaines phrases pourraient paraître étranges. </p>
             </div>
           </div>
 
@@ -77,24 +77,23 @@
           <div class="card border-danger mb-3" >
             <div class="card-body text-danger">
               <p class="card-text">
-                <b>Please read all the following information carefully before deciding whether to accept the HIT. </b></p>
-                During this task, your eye movements will be recorded using your web camera. <br>
-                Unfortunately, you will be unable to complete this HIT if you have any uncorrected vision impairments (e.g.,  amblyopia, or 'lazy eye').
-                If you use glasses/contact lenses for near or farsightedness, that's fine.
+                <b>Merci de lire attentivement les informations suivantes avant de décider si vous aimeriez accepter la tâche. </b></p>
+                Durant cette tâche, vos mouvements oculaires seront enregistrés via votre webcam. <br>
+                Malheureusement, vous ne pouvez pas compléter cette tâche si vous présentez des déficiences visuelles non corrigées. Vous pouvez utiliser des lunettes ou lentilles si vous en avez besoin pour votre myopie ou presbytie!
                 <br>
-                We will NOT record images of your face at any point: we will only record the coordinates of your eye movements. <br>
+                Nous n’enregistrons des images de votre visage à aucun moment: seulement les coordonnées de vos mouvements oculaire. <br>
               </div>
             </div>
 
             <div class="card border-success mb-3">
               <div class="card-body">
-                <h5 class="card-title"> Browser Width</h5>
-                <p class="card-text"> Your browser window must be at least 1280 pixels wide, while fitting within your computer display: you must be able to see everything in the browser window.
+                <h5 class="card-title"> Largeur du Navigateur</h5>
+                <p class="card-text"> Votre fenêtre de navigation doit être au moins 1280 pixels de large, mais doit aussi tenir entièrement dans l’afficheur de votre appareil: vous devrez être capable de voir la totalité des éléments affichés dans votre fenêtre.
                   <br>
-                  Please mazimize your browser now, and keep it maximized throughout the task.
+                  Merci de maximiser la largeur de votre fenêtre de navigateur, et de le laisser tel quel durant la totalité de la tâche.
                   <br>
-                  If you're unable to maximize it to at least 1280 pixels wide, do not accept the HIT.  you won't be able to start the HIT and will have to return it. </b></p>
-                  <b> Your current browser width is: <span id="dimensions"></span></b>
+                  Si vous ne pouvez pas atteindre 1280 pixels de largeur, n’acceptez pas la tâche; vous ne serez pas en mesure de démarrer. </b></p>
+                  <b> La largeur actuelle de votre fenêtre de navigation est: <span id="dimensions"></span></b>
                   <script>
                   $(window).resize(function() {
                     $("#dimensions").html($(window).width());
@@ -104,8 +103,8 @@
 
               <div class="card border-success mb-3">
                 <div class="card-body">
-                  <h5 class="card-title">Sound</h5>
-                  <p class="card-text">You <b> must </b> be able to play sound on your computer: you won't be able to complete the task satisfactorily if not.
+                  <h5 class="card-title">Son</h5>
+                  <p class="card-text">Vous <b> devez </b> être en mesure d’entendre des sons sur votre ordinateur: vous ne pourrez pas compléter la tâche de manière optimale dans le cas contraire.
                   </p>
                 </div>
               </div>
@@ -113,16 +112,16 @@
 
               <div class="card border-success mb-3">
                 <div class="card-body">
-                  <h5 class="card-title"> Browser version </h5>
+                  <h5 class="card-title"> Version du navigateur </h5>
 
-                  <p class="card-text">You must be using one of the following browser versions:
+                  <p class="card-text">Vous devez utiliser l’une des versions de navigateur suivantes:
                     <ul>
                       <p class="text-left">
-                        <li> <b> Google Chrome (version 53 or newer) - (Recommended browser) </b> </li>
-                        <li> Microsoft Edge (version 12 or newer) </li>
-                        <li> Mozilla Firefox (version 42 or newer) </li>
-                        <li> Opera (version 40 or newer) </li>
-                        <li> Safari (version 11 or newer) </li>
+                        <li> <b> Google Chrome (version 53 ou plus récent) - (Recommended browser) </b> </li>
+                        <li> Microsoft Edge (version 12 ou plus récent) </li>
+                        <li> Mozilla Firefox (version 42 ou plus récent) </li>
+                        <li> Opera (version 40 ou plus récent) </li>
+                        <li> Safari (version 11 ou plus récent) </li>
                       </p>
                     </ul>
                   </p>
@@ -132,15 +131,15 @@
 
               <div class="card border-success mb-3">
                 <div class="card-body">
-                  <h5 class="card-title"> Device and Lighting </h5>
+                  <h5 class="card-title"> Appareil et éclairage </h5>
                   <p class="card-text">
                     <ul>
-                      <li> You must be using a desktop or laptop with a web camera - you cannot use a tablet or cell phone </li>
-                      <li> Your device must be placed on a hard surface (e.g. table or desk), with the camera at your eye level </li>
-                      <li> You must be in a brightly lit room, with your face fully illuminated  </li>
-                      <li> You must stay in the same position and keep your head still throughout the calibration phase and task (around 7.5 mins)</li>
-                      <li> You must keep your browser maximized throughout the task </li>
-                      <li> If you can read the screen comfortably without glasses, please complete the task without them </li>
+                      <li> Vous devez utiliser un ordinateur de bureau/portable équipé d’une webcam - vous ne pouvez pas utiliser une tablette ou un téléphone mobile. </li>
+                      <li> Vous devez être dans une pièce bien éclairée, et votre visage devrait être de même complètement éclairé. </li>
+                      <li> Votre appareil doit être placé sur une surface solide (table ou bureau, par example), avec la caméra placée approximativement au niveau de vos yeux.  </li>
+                      <li> Vous devez être dans une pièce bien éclairée, et votre visage devrait être de même complètement éclairé.</li>
+                      <li> Vous devez rester dans la même position et garder votre tête relativement immobile durant la phase de calibration et la tâche en elle-même. </li>
+                      <li> Si vous pouvez facilement lire sur votre écran sans lunettes, veuillez compléter la tâche sans les utiliser. </li>
                     </ul>
                   </p>
                 </div>
@@ -148,41 +147,41 @@
 
               <div class="card border-success mb-3">
                 <div class="card-body">
-                  <h5 class="card-title"> Calibration Phase </h5>
+                  <h5 class="card-title"> Phase de calibration </h5>
                   <p class="card-text">
-                    Once you click Start, you will be enter a 'Calibration' phase before starting the task, where you can check that your head is in the correct position and your face is fully illuminated.
+                    Une fois avoir cliqué “Démarrer”, vous entrerez une phase de calibration avant de commencer la tâche. Vous vérifierez que votre tête est dans la position correcte et votre visage adéquatement éclairé.
                     <br>
-                    <b> IMPORTANT: You may need to perform the Calibration several times to achieve the required accuracy score (50%).
+                    <b> IMPORTANT: Vous pourriez avoir à performer la calibration plusieurs fois avant d’atteindre le score de précision requis (50%).
                       <br>
-                      If you are not in a brightly lit room, with your device on a hard surface and the camera at eye level, you may be unable to achieve the required Accuracy score, and will have to return the HIT. </b>
+                      Si vous n’êtes pas dans une pièce suffisamment éclairée, avec votre appareil sur une surface solide et la caméra a niveau de vos yeux, vous pourriez ne pas atteindre le score de précision requis, et aurez à arrêter la tâche. </b>
                       <br>
                       <br>
-                      After completing the Calibration, you will proceed to the task. At the end, you will be asked some brief questions about yourself. The entire HIT will take around 7.5 minutes in total.
+                      Après avoir complété la calibration, vous passerez à la tâche. Une fois la tâche complétée, nous vous poserons quelques questions à votre propos. La totalité de la tâche ne devrait pas durer plus de 10 minutes.
                       <br>
                     </p>
                   </div>
                 </div>
 
-                Please only click <b> Start </b> if you agree to all the above.
+                Ne cliquez <b> Démarrer </b> que si vous acceptez toutes les informations et conditions ci-dessus.
 
                 <br>
                 <br>
 
-                <p id="windowsize_err"><font color="red"> Your browser window must be at least 1280 pixels wide. Please maximize it. If you cannot maximize it to at least 1280 pixels wide, please return the HIT. </font></p>
-                <button id="start_button" type="button">Start</button> <br><br>
-                There will be multiple posted versions of this HIT throughout the day. Please only attempt one. Thank you!<br>
+                <p id="windowsize_err"><font color="red"> Votre fenêtre de navigation doit être au moins 1280 pixels de large. Merci de la maximiser. Si vous ne pouvez pas atteindre 1280 pixels de largeur, n’acceptez pas la tâche. </font></p>
+                <button id="start_button" type="button">Démarrer</button> <br>
+                <!--<br>
+                There will be multiple posted versions of this HIT throughout the day. Please only attempt one. Thank you!<br>-->
 
-                <p id="legal"> <b>LEGAL INFORMATION:</b>
-                  Please read the information below. By clicking Start, you agree that you have read the information and consent to participate in the survey.
-                  We invite you to participate in a research study on language production and comprehension. Your experimenter will ask you to do a linguistic task such as reading sentences or words, naming pictures or describing scenes, making up sentences of your own, or participating in a simple language game.
+                <p id="legal"> <b>INFORMATIONS LEGALES:</b>
+                  Merci de lire les informations ci-dessous. En cliquant “Démarrer”, vous acceptez d’avoir lu toutes les informations, et consentez à participer à l’enquête. 
+                  Nous vous invitons à participer à une étude de recherche concernant la production et compréhension du langage. Votre expérimentateur/trice vous demanderez d’effectuer une tâche linguistique telle que lire des mots ou phrases, ou regarder des vidéos.
                   <br>
-                  There are no risks or benefits of any kind involved in this study. You will be paid for your participation at the posted rate. If you have read this form and have decided to participate in this experiment, please understand your participation is voluntary and you have the right to withdraw your consent or discontinue participation at any time without penalty or loss of benefits to which you are otherwise entitled. You have the right to refuse to do particular tasks. Your individual privacy will be maintained in all published and written data resulting from the study. You may print this form for your records.
+                  Aucun risque ou bénéfice est impliqué dans cette enquête. Vous serez payé pour votre participation au taux affiché. Si vous avez lu ce formulaire et avez décidé de participer à cette étude, veuillez comprendre que votre participation est volontaire et que vous avez le droit de retirer votre consentement ou arrêter votre participation à n’importe quel moment, sans pénalité ou perte de bénéfices auxquels vous avez autrement droit. Vous avez le droit de refuser de participer à certaines tâches. Vos informations privées et individuelles seront conservées dans toutes données, publiées et écrites, résultant de cette étude. Vous pouvez imprimer ce formulaire pour vos dossiers. 
                   <br>
-                  <b>CONTACT INFORMATION:</b>
-                  If you have any questions, concerns or complaints about this research study, its procedures, risks and benefits, you should contact the Protocol Director Meghan Sumner at (650)-725-9336.
-                  If you are not satisfied with how this study is being conducted, or if you have any concerns, complaints, or general questions about the research or your rights as a participant, please contact the Stanford Institutional Review Board (IRB) to speak to someone independent of the research team at (650)-723-2480 or toll free at 1-866-680-2906. You can also write to the Stanford IRB, Stanford University, 3000 El Camino Real, Five Palo Alto Square, 4th Floor, Palo Alto, CA 94306 USA.
+                  <b>INFORMATIONS DE CONTACT:</b>
+                  Si vous avez des questions, préoccupations, ou plaintes à propos de cette étude, ces procédures, risques et bénéfices, vous devrez contacter le Directeur de Protocol (“Protocol Director”) Meghan Sumner à ce numéro: (650)-725-9336. Si vous n’êtes pas satisfait de la manière dont cette enquête a été conduite, ou si vous avez des préoccupations, plaintes, ou questions concernant l’étude ou vos droits en tant que participant, merci de contact le Stanford Institutional Review Board (IRB) pour parler à un individu indépendant de l’équipe de recherche à ce numéro, sans frais: 1-866-680-2906. Vous pouvez également écrire à “Stanford IRB, Stanford University”, 3000 El Camino Real, Five Palo Alto Square, 4th Floor, Palo Alto, CA 94306 USA.
                   <br>
-                  If you agree to participate, please proceed to the study tasks. </p>
+                  Si vous acceptez de participer, merci de poursuivre vers les tâches d’étude. </p>
                 </div>
               </div>
 
@@ -195,11 +194,11 @@
                 <nav id="webgazerNavbar" class="navbar navbar-nav navbar-fixed-top">
                   <div class="container-fluid">
                     <div class="navbar-header">
-                      <button id="start_camera" onclick="_s.start_camera()">Start Camera</button>
-                      <button id="start_calibration" onclick="Restart()"> Calibrate</button>
+                      <button id="start_camera" onclick="_s.start_camera()">Démarrer la caméra</button>
+                      <button id="start_calibration" onclick="Restart()"> Calibrer</button>
                       <!-- <button id="restart_calibration" onclick="Restart()">recalibrate</button> <--hide until done once -->
-                      <button id = 'begin_task' onclick="_s.finish_calibration_start_task()"> Begin Task</button>
-                      <button id = 'helpbutton' onclick="helpModalShow()"> Help </button>
+                      <button id = 'begin_task' onclick="_s.finish_calibration_start_task()"> Démarrer la tâche</button>
+                      <button id = 'helpbutton' onclick="helpModalShow()"> Aide </button>
 
                       <a class id="Accuracy"> </a>
                     </div>
@@ -227,12 +226,12 @@
                     <!-- Modal content-->
                     <div class="modal-content">
                       <div class="modal-body">
-                        <img src="helpmodalimg.png" class="img-responsive">
+                        <img src="helpmodalimg.png" class="img-responsive" >
 
                       </div>
                       <div class="modal-footer">
-                        <button id="closeBtn" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="_s.start_camera()">Start Camera</button>
+                        <button id="closeBtn" type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="_s.start_camera()">Démarrer la caméra</button>
                       </div>
                     </div>
 
@@ -245,15 +244,15 @@
               <div class="slide" id="sound_test">
 
                 <div class="text-center">
-                  Press the play button to make sure you can hear the audio clip, and adjust the volume as necessary.  You won't be able to complete the task satisfactorily if you can't hear the audio.
+                  Cliquez sur le bouton “Play” pour vérifier que vous pouvez entendre le clip audio, et ajustez le volume si nécessaire.
                   <br>
-                  In the task, the audio will play automatically, and you'll only hear it once - so listen carefully!
+                  Durant la tâche, l’audio jouera automatiquement, donc écoutez attentivement!
                   <br>
                   <br>
                   <audio id="soundtest" controls src='soundtest.mp3'> </audio>
                   <br>
                   <br>
-                  <button id = "soundtest_OK" onclick="_s.soundtest_OK()"> Click here if you can hear the audio clearly. </button> </p>
+                  <button id = "soundtest_OK" onclick="_s.soundtest_OK()"> Cliquez ici si vous pouvez entendre l’audio nettement. </button> </p>
                 </div>
               </div>
 
@@ -267,8 +266,8 @@
                 </div>
                 <br>
                 <div class="text-center">
-                  <button id = "continue_button" onclick="_s.continue()" style="width:100px; height:30px"> Continue </button> </p>
-                  <button id = "next_button" onclick="_s.next_trial()" style="width:50px; height:30px"> Next </button> </p>
+                  <button id = "continue_button" onclick="_s.continue()" style="width:100px; height:30px"> Continuer </button> </p>
+                  <button id = "next_button" onclick="_s.next_trial()" style="width:70px; height:30px"> Suivant </button> </p>
                   <!--<p class="err"><font color="red">Please select a person </font></p>-->
                 </div>
               </div>
@@ -277,55 +276,55 @@
 
               <div class="slide"  id="subj_info">
                 <div class="text-center">
-                  <p class="subj_info_title">Please answer the brief questions below.</p>
+                  <p class="subj_info_title">Merci de répondre aux simples questions ci-dessous.</p>
                   <br>
-                  <div class="subj_info_title">About you</div>
+                  <div class="subj_info_title">A votre propos</div>
 
-                  <p>First Language(s) (the language(s) you spoke at home as a child): <input type="text" id="language"/> </p>
+                  <p>Première(s) Langue(s) (la/les langue(s) que vous parliez chez vous enfant): <input type="text" id="language"/> </p>
 
-                  <p>Gender:
+                  <p>Genre:
                     <select id="gender">
                       <label><option value=""/></label>
-                      <label><option value="Male"/>Male</label>
-                      <label><option value="Female"/>Female</label>
-                      <label><option value="Other"/>Other</label>
+                      <label><option value="Male"/>Homme</label>
+                      <label><option value="Female"/>Femme</label>
+                      <label><option value="Other"/>Autre</label>
                     </select>
                   </p>
 
-                  <p>Age: <input type="text" id="participantage"/></p>
+                  <p>Âge: <input type="text" id="participantage"/></p>
 
                   <br>
-                  <div class="subj_info_title">About the task </div>
+                  <div class="subj_info_title">À propos de la tâche </div>
 
-                  <p>Do you need to wear glasses (or contact lenses) to correct your vision?:
+                  <p>Avez-vous besoin de porter des lunettes (ou lentilles de contact) pour corriger votre vision?:
                     <select id="eyesight">
                       <label><option value="-1"/></label>
-                      <label><option value="none"/>No</label>
-                      <label><option value="nearsighted"/>Yes, I'm nearsighted (can't see well far away)</label>
-                      <label><option value="farsighted"/>Yes, I'm farsighted (can't see well close up)</label>
+                      <label><option value="none"/>Non</label>
+                      <label><option value="nearsighted"/>Oui, je suis myope (difficulté à voir si loin)</label>
+                      <label><option value="farsighted"/>Oui, je suis presbyte (difficulté à bien voir si proche)</label>
                     </select>
                   </p>
-                  <p>During the task, were you wearing glasses or contact lenses?:
+                  <p>Durant la tâche, portiez-vous des lunettes ou des lentilles de contact?
                     <select id="eyesight_task">
                       <label><option value="-1"/></label>
-                      <label><option value="neither"/>No, neither</label>
-                      <label><option value="glasses"/>Glasses</label>
-                      <label><option value="contacts"/>Contact lenses</label>
+                      <label><option value="neither"/>Non, aucun des deux</label>
+                      <label><option value="glasses"/>Lunettes</label>
+                      <label><option value="contacts"/>Lentilles de contact</label>
                     </select>
                   </p>
 
-                  <p>(Optional) Do you have any comments about the HIT (any problems, etc.) ? </p>
+                  <p>(Facultatif) Avez-vous des commentaires concernant la tâche (problèmes rencontrés etc.)?</p>
                   <textarea id="comments" rows="3" cols="50"></textarea>
                   <br/>
-                  <p class="err_part2"><font color="red">Please complete all non-optional questions! </font></p>
+                  <p class="err_part2"><font color="red">Merci de compléter toutes les questions non-facultatives! </font></p>
                   <br>
-                  <button onclick="_s.submit()"> Finish </button>
+                  <button onclick="_s.submit()"> Terminer </button>
                 </div>
               </div>
 
 
               <div id="thanks" class="slide js" >
-                <p  class="big">Thanks for your time!</p>
+                <p  class="big">Merci pour votre temps!</p>
               </div>
 
             </body>
