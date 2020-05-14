@@ -56,9 +56,10 @@ function make_slides(f) {
       exp.trial_no += 1;
       $("#aud").hide();
       descriptor_name = descriptor.item;
-      descriptor_fnames = _.shuffle(vid_fnames[descriptor_name])
-      vid1_fname = descriptor_fnames[0]
-      vid2_fname = descriptor_fnames[1]
+      descriptor_condition = descriptor.condition;
+      descriptor_fnames = _.shuffle(vid_fnames[descriptor_name]);
+      vid1_fname = descriptor_fnames[0];
+      vid2_fname = descriptor_fnames[1];
       exp.play_videos(); // show videos
 
       // get data from webgazer
@@ -93,7 +94,9 @@ function make_slides(f) {
     log_responses : function (){
       exp.data_trials.push({
         "condition": exp.condition,
+        "trial_no" : exp.trial_no,
         "descriptor" : descriptor_name,
+        "descriptor_condition": descriptor_condition,
         'left_video' : vid1_fname,
         'right_video' : vid2_fname,
         "start_time" : _s.trial_start,
@@ -101,19 +104,24 @@ function make_slides(f) {
         "current_windowH" : window.innerHeight,
         "end_pre1_time" : exp.end_pre1_time,
         "pre1_duration" : exp.end_pre1_time - _s.trial_start,
+        "pre1_time_from_start" : exp.end_pre1_time - _s.trial_start,
         "end_pre2_time" : exp.end_pre2_time,
         "pre2_duration" : exp.end_pre2_time - exp.end_pre1_time,
+        "pre2_time_from_start": exp.end_pre2_time - _s.trial_start,
         "end_contrast_time" : exp.end_contrast_time,
         "contrast_duration" : exp.end_contrast_time - exp.end_pre2_time,
+        "contrast_time_from_start": exp.end_contrast_time - _s.trial_start,
         "end_audio_time" : exp.end_audio_time,
         "audio_duration" : exp.end_audio_time - exp.end_contrast_time,
+        "audio_time_from_start": exp.end_audio_time - _s.trial_start,
         "end_event_time" : exp.end_event_time,
         "event_duration": exp.end_event_time - exp.end_contrast_time,
-        "trial_no" : exp.trial_no,
+        "event_time_from_start": exp.end_event_time -_s.trial_start,
         'time' : exp.tlist,
         'x' : exp.xlist,
         'y': exp.ylist
       });
+      console.log(exp.data_trials)
     }
 
   });
