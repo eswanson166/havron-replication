@@ -28,7 +28,7 @@ $file_handle = fopen('results/participant_codes.txt', 'a');
 fwrite($file_handle, $participant_id.',');
 fclose($file_handle);
 
-echo("<b>Thanks for participating!</b> Your participation code is ".$participant_id.".<p>You may now close the screen.")
+echo("<b>Merci d'avoir participé!</b> Votre code de participation est: ".$participant_id.".<p>Vous pouvez fermer la fenêtre.")
 
 // header( 'Location: http://stanford.edu/~bwaldon/cgi-bin/lingexp/partcode.php' );   
 ?>
