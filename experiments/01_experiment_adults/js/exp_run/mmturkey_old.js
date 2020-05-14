@@ -25,10 +25,10 @@ turk = turk || {};
       return res;
     };
   }
-  
+
   var hopUndefined = !Object.prototype.hasOwnProperty,
       showPreviewWarning = true;
-  
+
   // We can disable the previewWarning by including this script with "nowarn" in the script url
   // (i.e. mmturkey.js?nowarn). This doesn't work in FF 1.5, which doesn't define document.scripts
   if (document.scripts) {
@@ -40,7 +40,7 @@ turk = turk || {};
       }
     }
   }
-  
+
   var param = function(url, name ) {
     name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
     var regexS = "[\\?&]"+name+"=([^&#]*)";
@@ -48,7 +48,7 @@ turk = turk || {};
     var results = regex.exec( url );
     return ( results == null ) ? "" : results[1];
   }
-  
+
   // Give an HTML representation of an object
   var htmlify = function(obj) {
     if (obj instanceof Array) {
@@ -70,7 +70,7 @@ turk = turk || {};
       return obj.toString();
     }
   };
-  
+
   var addFormData = function(form,key,value) {
     var input = document.createElement('input');
     input.type = 'hidden';
@@ -82,7 +82,7 @@ turk = turk || {};
   var url = window.location.href,
       src = param(url, "assignmentId") ? url : document.referrer,
       keys = ["assignmentId","hitId","workerId","turkSubmitTo"];
-  
+
   keys.map(function(key) {
     turk[key] = unescape(param(src, key));
   });
@@ -96,7 +96,7 @@ turk = turk || {};
         turkSubmitTo = turk.turkSubmitTo,
         rawData = {},
         form = document.createElement('form');
-   
+
     document.body.appendChild(form);
 
     if (assignmentId) {
@@ -112,8 +112,8 @@ turk = turk || {};
       }
     }
 
-    // Change to if (true) to get local view
-    if (true) {
+    // If there's no turk info
+    if (!assignmentId || !turkSubmitTo) {
       // Emit the debug output and stop
       var div = document.createElement('div');
       div.style.fontFamily = '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", sans-serif';
@@ -124,15 +124,14 @@ turk = turk || {};
       div.innerHTML = "<p><b>Debug mode</b></p>Here is the data that would have been submitted to Turk: <ul>" + htmlify(rawData) + "</ul>"
       document.body.appendChild(div);
       return;
-    } else {
-      form.action = "collectdata.php"
-      form.method = "post";
-      form.submit();
     }
 
-   
+    // Otherwise, submit the form
+    form.action = turk.turkSubmitTo + "/mturk/externalSubmit";
+    form.method = "POST";
+    form.submit();
   }
-  
+
   // simulate $(document).ready() to show the preview warning
   if (showPreviewWarning && turk.previewMode) {
     var intervalHandle = setInterval(function() {
@@ -140,7 +139,7 @@ turk = turk || {};
         var div = document.createElement('div'), style = div.style;
         style.backgroundColor = "gray";
         style.color = "white";
-        
+
         style.position = "absolute";
         style.margin = "0";
         style.padding = "0";
@@ -152,18 +151,18 @@ turk = turk || {};
         style.fontFamily = "arial";
         style.fontSize = "24px";
         style.fontWeight = "bold";
-        
+
         style.opacity = "0.5";
         style.filter = "alpha(opacity = 50)";
-        
+
         div.innerHTML = "PREVIEW MODE: CLICK \"ACCEPT\" ABOVE TO START THIS HIT";
-        
+
         document.body.appendChild(div);
         clearInterval(intervalHandle);
       } catch(e) {
-        
+
       }
     },20);
   }
-  
+
 })();

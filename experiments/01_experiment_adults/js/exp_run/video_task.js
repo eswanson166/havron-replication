@@ -199,7 +199,7 @@ function init_explogic() {
       exp.filler_descriptors.push(descriptors[i]);
     else if (descriptors[i].condition == "test")
       exp.test_descriptors.push(descriptors[i]);
-    else if (descriptors[i].condition == "gen")
+    else if (descriptors[i].condition == "gen") // the trial where we test whether syntactic adaptation generalizes
       exp.gen_descriptors.push(descriptors[i]);
   }
   // shuffle training, filler, and test descriptors
