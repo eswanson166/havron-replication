@@ -113,7 +113,7 @@ turk = turk || {};
     }
 
     // Change to if (true) to get local view
-    if (true) {
+    if (false) {
       // Emit the debug output and stop
       var div = document.createElement('div');
       div.style.fontFamily = '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", sans-serif';

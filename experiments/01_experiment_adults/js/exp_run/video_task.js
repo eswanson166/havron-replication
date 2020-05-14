@@ -226,7 +226,7 @@ function init_explogic() {
 
 
   //create experiment order and make slides
-  exp.structure=[/*"i0",  "training_and_calibration", */"sound_test", "single_trial", "subj_info", "thanks"];
+  exp.structure=["i0",  "training_and_calibration", "sound_test", "single_trial", "subj_info", "thanks"];
   exp.slides = make_slides(exp);
   exp.nQs = utils.get_exp_length();
 
