@@ -229,6 +229,31 @@ p.descriptor {
 	transform: translate(-50%, -50%);
 }
 
+/* Progress Bar */
+.progress{
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+.progress span{
+  position:relative;
+  top: -2px;
+}
+
+.bar-wrapper{
+    height:20px;
+    width:200px;
+    border:1px solid #000000;
+    display:inline-block;
+}
+
+.bar{
+    position:relative;
+    height:100%;
+    width:0px;
+    background-color:#000000
+}
+
 #video {
 	margin: 0;
 	position: absolute;

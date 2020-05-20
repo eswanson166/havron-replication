@@ -30,7 +30,7 @@ make_exp = function() {
       var slide_name = this.structure[this.slideIndex];
       console.log("Beginning "+ slide_name);
       _s = this.slides[slide_name];
-      /*$('#progress').css('visibility', 'hidden');*/
+      $('#progress').css('visibility', 'visible');
       if(_s != undefined) {
         _s.init_explogic(); //defined in stream.js
       } else {
