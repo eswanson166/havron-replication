@@ -1,0 +1,134 @@
+---
+title: "data_cleaning"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(plyr)
+library(dplyr)
+library(readr)
+```
+
+## Loading data
+
+We first load the individual participant files and then combine them into one dataset.
+```{r}
+dir <- "../data/raw_data"
+participant_files <- list.files(path=dir, full.names=TRUE)
+et_data <- plyr::ldply(participant_files, read_csv)
+```
+
+## Cleaning data
+
+We take out data points that were simply used to test the experiment (and therefore had the experimenter's name in the comments).
+```{r}
+et_data <- et_data %>% filter(!grepl("lizabeth",comments))
+```
+
+We also remove participants who do not list French as their native language.
+```{r}
+et_data <- et_data %>% filter(grepl("(fran(ç|c)ais(e?))|(french)", 
+                                    ignore.case=TRUE,language))
+```
+
+We also take out participants who did not complete at least 50% of trials.
+```{r}
+# add a column with number of trials completed
+et_data <- ddply(et_data, .(participant_id), mutate, trials_completed = length(unique(trial_no)))
+
+# filter out participants who have completed <5 trials
+et_data <- et_data %>% filter(trials_completed >= 5)
+```
+
+We remove trials with a window width of less than 1280 pixels.
+```{r}
+et_data <- et_data %>% filter(screenW >= 1280)
+```
+
+Finally, we need to add a new column that gives the time since the beginning of the trial.
+```{r}
+# make a column with the datapoint number during the trial
+et_data <- et_data %>% ddply(.(participant_id, trial_no), mutate, data_point_no = seq_along(time))
+
+# make a column with starting time of the trial
+et_data <- et_data %>% ddply(.(participant_id, trial_no), mutate, starting_time = time[data_point_no == 1])
+
+# make a column with the time since the beginning of the trial
+et_data <- et_data %>% mutate(time_since_trial_start = time - starting_time)
+```
+
+
+## Adding AOIs
+
+We also add the AOIs for this experiment. Note that this is based on the size of the specific videos we used (400 pixels wide and 226 pixels high).
+
+First, add the coordinates for the video on the left (video 1).
+```{r}
+et_data$vid1_left_x <- (et_data$screenW - 1280)/2
+et_data$vid1_right_x <- et_data$vid1_left_x + 400
+et_data$top_y <- (et_data$screenH - 226)/2
+et_data$bottom_y <- et_data$top_y + 226
+```
+
+Then, add the coordinates for the video on the right (video 2).
+```{r}
+et_data$vid2_left_x <- (et_data$vid1_left_x + 880)
+et_data$vid2_right_x <- (et_data$vid1_right_x + 880)
+```
+
+We add a column that is TRUE if the participant was looking at the video on the left.
+```{r}
+et_data$look_left_video <- FALSE
+et_data$look_left_video[(et_data$vid1_left_x <= et_data$x) & (et_data$x <= et_data$vid1_right_x) & (et_data$top_y <= et_data$y) & (et_data$y <= et_data$bottom_y)] <- TRUE
+```
+
+We add a column that is TRUE if the participant was looking at the video on the right.
+```{r}
+et_data$look_right_video <- FALSE
+et_data$look_right_video[(et_data$vid2_left_x <= et_data$x) & (et_data$x <= et_data$vid2_right_x) & (et_data$top_y <= et_data$y) & (et_data$y <= et_data$bottom_y)] <- TRUE
+```
+
+
+## Looking at action or noun video
+
+We add a column that states whether the action video was on the left or the right.
+```{r}
+et_data$action_video <- "right"
+et_data$action_video[grepl("verb", et_data$left_video)] <- "left"
+```
+
+We also add a column that is TRUE if the participant was looking at the action video.
+```{r}
+et_data$look_action_video <- FALSE
+et_data$look_action_video[et_data$look_left_video == TRUE & et_data$action_video == "left"] <- TRUE
+et_data$look_action_video[et_data$look_right_video == TRUE & et_data$action_video == "right"] <- TRUE
+```
+
+We also add a column that is TRUE if the participant was looking at the noun video.
+```{r}
+et_data$look_noun_video <- FALSE
+et_data$look_noun_video[et_data$look_left_video == TRUE & et_data$action_video == "right"] <- TRUE
+et_data$look_noun_video[et_data$look_right_video == TRUE & et_data$action_video == "left"] <- TRUE
+```
+
+
+## Previous look
+
+Finally, we add columns that indicate whether the participant was looking at the action video or the noun video on the previous look.
+```{r}
+# action video
+et_data <- et_data %>% ddply(.(participant_id, trial_no), mutate, previous_look_action_video = lag(look_action_video))
+
+# noun video
+et_data <- et_data %>% ddply(.(participant_id, trial_no), mutate, previous_look_noun_video = lag(look_noun_video))
+```
+
+
+## Write the data to a .csv file
+
+Now the data is ready for visualization and analysis. We write it to a .csv file.
+```{r}
+write.csv(et_data, "../data/clean_data.csv")
+```
+

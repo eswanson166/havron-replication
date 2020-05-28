@@ -28,7 +28,9 @@ $file_handle = fopen('results/participant_codes.txt', 'a');
 fwrite($file_handle, $participant_id.',');
 fclose($file_handle);
 
-echo("<b>Merci d'avoir participé!</b> Votre code de participation est: ".$participant_id.".<p>Vous pouvez fermer la fenêtre.")
+echo("<b>Merci d'avoir participé!</b> <p>Veuillez procéder à: </p> <a href='https://app.prolific.co/submissions/complete?cc=597AED7B'>Prolific</a>")
 
-// header( 'Location: http://stanford.edu/~bwaldon/cgi-bin/lingexp/partcode.php' );   
+//Votre code de participation est: ".$participant_id.".
+
+// header( 'https://stanford.edu/~elizswan/cgi-bin/havron_experiment_adults/results' );   
 ?>

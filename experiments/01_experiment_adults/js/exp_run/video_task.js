@@ -57,13 +57,20 @@ function make_slides(f) {
       $("#aud").hide();
       descriptor_name = descriptor.item;
       descriptor_condition = descriptor.condition;
-      descriptor_fnames = _.shuffle(vid_fnames[descriptor_name]);
-      vid1_fname = descriptor_fnames[0];
-      vid2_fname = descriptor_fnames[1];
+      if (exp.order == "order1") {
+        left_vid_type = order1_left_descriptors[(exp.trial_no - 1)];
+        right_vid_type = order2_left_descriptors[(exp.trial_no - 1)];
+      }
+      else {
+        left_vid_type = order2_left_descriptors[(exp.trial_no - 1)];
+        right_vid_type = order1_left_descriptors[(exp.trial_no - 1)];
+      }
+      vid1_fname = descriptor_name + "_" + left_vid_type;
+      vid2_fname = descriptor_name + "_" + right_vid_type;
       exp.play_videos(); // show videos
 
       // get data from webgazer
-      webgazer.resume();
+      //webgazer.resume();
       webgazer.setGazeListener(function(data, elapsedTime) {
         if (data == null) {
           return;
@@ -94,6 +101,7 @@ function make_slides(f) {
     log_responses : function (){
       exp.data_trials.push({
         "condition": exp.condition,
+        "order": exp.order,
         "trial_no" : exp.trial_no,
         "descriptor" : descriptor_name,
         "descriptor_condition": descriptor_condition,
@@ -121,7 +129,6 @@ function make_slides(f) {
         'x' : exp.xlist,
         'y': exp.ylist
       });
-      console.log(exp.data_trials)
     }
 
   });
@@ -134,6 +141,7 @@ function make_slides(f) {
       gend = $("#gender").val();
       eyesight = $("#eyesight").val();
       eyesight_task = $("#eyesight_task").val();
+      prolific_id
       if(lg == '' || age == '' || gend == '' || eyesight == '-1' || eyesight_task == '-1'){
         $(".err_part2").show();
       } else {
@@ -144,6 +152,7 @@ function make_slides(f) {
           gender : $("#gender").val(),
           eyesight : $("#eyesight").val(),
           eyesight_task : $("#eyesight_task").val(),
+          prolific_id : $("#prolific_id").val(),
           comments : $("#comments").val(),
           accuracy : precision_measurement,
           previous_accuracy_attempts : exp.accuracy_attempts,
@@ -199,6 +208,7 @@ function init_explogic() {
   exp.gen_descriptors = []
   exp.descriptors = [];
   exp.condition = _.sample(["noun", "verb"]);
+  exp.order = _.sample(["order1", "order2"]);
   for (var i = 0; i<descriptors.length; i++){
     if (descriptors[i].condition == exp.condition)
       exp.train_descriptors.push(descriptors[i]);
@@ -231,6 +241,9 @@ function init_explogic() {
   for (var i = 0; i<(exp.gen_descriptors.length); i++){
     exp.descriptors.push(exp.gen_descriptors[i]);
   }
+  order1_left_descriptors = ["noun", "verb", "noun", "verb", "noun", "verb", "noun", "verb", "noun", "verb"]
+  order2_left_descriptors = ["verb", "noun", "verb", "noun", "verb", "noun", "verb", "noun", "verb", "noun"]
+  // labels for descriptors on trials 3 and 4 are reversed because they're fillers
 
 
   //create experiment order and make slides
@@ -254,6 +267,7 @@ function init_explogic() {
   exp.play_videos = function(){
 
     ///////////////// PREVIEW VIDEOS: LEFT, THEN RIGHT \\\\\\\\\\\\\\\\\
+    webgazer.resume()
     if (document.getElementById("vid_table") != null){
       $("#vid_table tr").remove();
     }
@@ -308,10 +322,6 @@ function init_explogic() {
       vid2_pre.style.visibility = 'visible';
       vid2_pre.play();
     })
-
-    /* set fixation point (TODO: WHAT IS FIXATION POINT?)
-    setTimeout(function(){
-      vid1_pre.style.visibility = 'visible';}, 1000);*/
 
 
     //////////////////// CONTRAST: BOTH VIDEOS AT ONCE \\\\\\\\\\\\\\\\\\\
@@ -424,6 +434,7 @@ function init_explogic() {
           // when the event videos are over, add in a next button
           vid2_ev.addEventListener('ended', function(){
             exp.end_event_time = Date.now()
+            webgazer.pause()
             setTimeout(function(){
             $("#img_table tr").remove();
             $("#next_button").show(); }, 100);
