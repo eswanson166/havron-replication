@@ -1,6 +1,6 @@
 ---
-title: "data_cleaning"
-output: html_document
+title: "Havron replication data cleaning"
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
@@ -16,7 +16,7 @@ We first load the individual participant files and then combine them into one da
 ```{r}
 dir <- "../data/raw_data"
 participant_files <- list.files(path=dir, full.names=TRUE)
-et_data <- plyr::ldply(participant_files, read_csv)
+et_data <- plyr::ldply(participant_files, read.csv)
 ```
 
 ## Cleaning data
@@ -46,6 +46,9 @@ We remove trials with a window width of less than 1280 pixels.
 et_data <- et_data %>% filter(screenW >= 1280)
 ```
 
+
+## Time of the video
+
 Finally, we need to add a new column that gives the time since the beginning of the trial.
 ```{r}
 # make a column with the datapoint number during the trial
@@ -55,7 +58,18 @@ et_data <- et_data %>% ddply(.(participant_id, trial_no), mutate, data_point_no 
 et_data <- et_data %>% ddply(.(participant_id, trial_no), mutate, starting_time = time[data_point_no == 1])
 
 # make a column with the time since the beginning of the trial
+et_data$time <- as.numeric(et_data$time)
 et_data <- et_data %>% mutate(time_since_trial_start = time - starting_time)
+```
+
+
+We also add a column stating what part of the video is playing at that data point.
+```{r}
+et_data$video_stage <- "left_preview"
+et_data$video_stage[et_data$time_since_trial_start > et_data$pre1_time_from_start] <- "right_preview"
+et_data$video_stage[et_data$time_since_trial_start > et_data$pre2_time_from_start] <- "contrast"
+et_data$video_stage[et_data$time_since_trial_start > et_data$contrast_time_from_start] <- "audio"
+et_data$video_stage[et_data$time_since_trial_start > et_data$audio_time_from_start] <- "event"
 ```
 
 
@@ -90,7 +104,7 @@ et_data$look_right_video[(et_data$vid2_left_x <= et_data$x) & (et_data$x <= et_d
 ```
 
 
-## Looking at action or noun video
+## Looking at action or object video
 
 We add a column that states whether the action video was on the left or the right.
 ```{r}
@@ -107,9 +121,9 @@ et_data$look_action_video[et_data$look_right_video == TRUE & et_data$action_vide
 
 We also add a column that is TRUE if the participant was looking at the noun video.
 ```{r}
-et_data$look_noun_video <- FALSE
-et_data$look_noun_video[et_data$look_left_video == TRUE & et_data$action_video == "right"] <- TRUE
-et_data$look_noun_video[et_data$look_right_video == TRUE & et_data$action_video == "left"] <- TRUE
+et_data$look_object_video <- FALSE
+et_data$look_object_video[et_data$look_left_video == TRUE & et_data$action_video == "right"] <- TRUE
+et_data$look_object_video[et_data$look_right_video == TRUE & et_data$action_video == "left"] <- TRUE
 ```
 
 
@@ -121,9 +135,19 @@ Finally, we add columns that indicate whether the participant was looking at the
 et_data <- et_data %>% ddply(.(participant_id, trial_no), mutate, previous_look_action_video = lag(look_action_video))
 
 # noun video
-et_data <- et_data %>% ddply(.(participant_id, trial_no), mutate, previous_look_noun_video = lag(look_noun_video))
+et_data <- et_data %>% ddply(.(participant_id, trial_no), mutate, previous_look_object_video = lag(look_object_video))
 ```
 
+## Proportion of looks
+
+ACTUALLY, THIS DOESN'T MEAN ANYTHING SINCE IT'S NOT SEPARATED OUT BY TYPE OF TRIAL...
+
+We add columns for proportion of looks toward the action video and toward the noun video on a single trial.
+```{r, eval=FALSE}
+et_data <- et_data %>% group_by(participant_id) %>%
+  mutate(proportion_look_action = mean(look_action_video),
+         proportion_look_noun = mean(look_noun_video))
+```
 
 ## Write the data to a .csv file
 

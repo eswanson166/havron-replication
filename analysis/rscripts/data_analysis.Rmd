@@ -1,0 +1,123 @@
+---
+title: "Havron replication data analysis"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("helpers.R")
+library(lme4)
+library(dplyr)
+library(tidyverse)
+library(eyetrackingR)
+```
+
+## Load the data
+
+Note: the zip file with clean data must be unzipped before running this code.
+```{r}
+et_data <- read.csv("../data/clean_data.csv", stringsAsFactors = TRUE)
+```
+
+## Pull out the test data
+
+We want to examine the test trials, specifically when they are at the event stage.
+```{r}
+detach(package:plyr)
+test_data <- et_data %>% filter(descriptor_condition == "test",
+                                video_stage == "event")
+```
+
+Add a column for proportion of looks on each test trial.
+```{r}
+test_data <- test_data %>% group_by(participant_id, trial_no) %>%
+  mutate(proportion_look_action = mean(look_action_video),
+         proportion_look_object = mean(look_object_video))
+```
+
+
+## Linear regression
+
+Add a column with ArcSin-transformed proportion of looks toward the action and noun videos.
+```{r}
+test_data <- test_data %>% 
+  mutate(arcsin_prop_action = asin(sqrt((proportion_look_action))),
+         arcsin_prop_object = asin(sqrt((proportion_look_object))))
+```
+
+First we build a mixed effects linear model regressing ArcSin-transformed proportion of looks on condition, with a random intercept for participant.
+```{r}
+lin <- lmer(arcsin_prop_action ~ condition + (1|participant_id), 
+            data = test_data, REML = F)
+summary(lin)
+```
+
+It looks like the intercept and condition are highly correlated. Try centering condition: 
+```{r}
+test_data$center_condition <- myCenter(test_data$condition)
+```
+
+Rerun the linear regression:
+```{r}
+lin.c <- lmer(arcsin_prop_action ~ center_condition + (1|participant_id), 
+            data = test_data, REML = F)
+summary(lin.c)
+```
+
+This takes care of the collinearity.
+
+If we treat non-AOI looks as missing:
+```{r}
+temp <- test_data %>% filter(look_action_video == TRUE | 
+                               look_object_video == TRUE)
+lin.c.temp <- lmer(arcsin_prop_action ~ center_condition + (1|participant_id), 
+            data = temp, REML = F)
+summary(lin.c.temp)
+```
+
+## Logistic regression
+
+Now we build a mixed effects logistic regression model predicting log odds of looking towards the action video over looking towards the object video as a function of condition, with random intercepts for participant and previous look.
+```{r}
+lg <- glmer(look_action_video ~ center_condition + (1|participant_id) +
+               (1|previous_look_action_video), 
+             data = test_data,
+             family = "binomial")
+summary(lg)
+```
+
+Convert this back to proportions:
+```{r}
+logit2prop <- function(l){
+  exp(l)/(1+exp(l))
+}
+
+logit2prop(-1.8269)
+logit2prop(0.7260)
+```
+
+
+## Cluster-based permutation analysis
+
+```{r, eval = FALSE}
+# problem: our eye-tracker did not sample at uniform sampling rate
+
+test_data$trackloss <- FALSE
+test_df <- make_eyetrackingr_data(test_data, 
+                                  participant_column = "participant_id",
+                                  trial_column = "trial_no",
+                                  time_column = "time_since_trial_start",
+                                  trackloss_column = "trackloss",
+                                  aoi_columns = "look_action_video",
+                                  treat_non_aoi_looks_as_missing = TRUE)
+test_df <- make_time_sequence_data(test_df, time_bin_size = 20,
+                                   predictor_columns = c("condition"),
+                                   other_dv_columns = c("arcsin_prop_action"),
+                                   summarize_by = "participant_id")
+test_df <- make_time_cluster_data(test_df, predictor = "condition",
+                                       aoi = "look_action_video",
+                                       test = "t.test",
+                                       threshold = 1.5,
+                                       formula = arcsin_prop_action ~ condition)
+head(test_df)
+```
