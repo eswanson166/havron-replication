@@ -1,4 +1,1 @@
-Save graphs here by running the rscript.
-
-example code to save a graph here:  
-ggsave(file="../graphs/example.pdf",width=8,height=3)
+All graphs reported in the visualization file and in the write-up of this experiment are saved here.

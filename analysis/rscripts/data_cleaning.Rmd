@@ -5,7 +5,6 @@ output: word_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(plyr)
 library(dplyr)
 library(readr)
 ```
@@ -15,27 +14,32 @@ library(readr)
 We first load the individual participant files and then combine them into one dataset.
 ```{r}
 dir <- "../data/raw_data"
-participant_files <- list.files(path=dir, full.names=TRUE)
-et_data <- plyr::ldply(participant_files, read.csv)
+participant_files <- list.files(path = dir, full.names = TRUE)
+et_data <- plyr::ldply(participant_files, function(x) {
+  read_csv(x)
+})
+et_data <- et_data %>% mutate_if(is.character, factor)
 ```
 
 ## Cleaning data
 
 We take out data points that were simply used to test the experiment (and therefore had the experimenter's name in the comments).
 ```{r}
-et_data <- et_data %>% filter(!grepl("lizabeth",comments))
+et_data <- et_data %>% filter(!grepl("Elizabeth",comments))
 ```
 
 We also remove participants who do not list French as their native language.
 ```{r}
-et_data <- et_data %>% filter(grepl("(fran(ç|c)ais(e?))|(french)", 
+unique(et_data$language)
+et_data <- et_data %>% filter(grepl("(fran(ç|c)ais(e?))|(france)|(french)", 
                                     ignore.case=TRUE,language))
 ```
 
 We also take out participants who did not complete at least 50% of trials.
 ```{r}
 # add a column with number of trials completed
-et_data <- ddply(et_data, .(participant_id), mutate, trials_completed = length(unique(trial_no)))
+et_data <- et_data %>% group_by(participant_id) %>% 
+  mutate(trials_completed = length(unique(trial_no)))
 
 # filter out participants who have completed <5 trials
 et_data <- et_data %>% filter(trials_completed >= 5)
@@ -49,13 +53,15 @@ et_data <- et_data %>% filter(screenW >= 1280)
 
 ## Time of the video
 
-Finally, we need to add a new column that gives the time since the beginning of the trial.
+We need to add a new column that gives the time since the beginning of the trial.
 ```{r}
 # make a column with the datapoint number during the trial
-et_data <- et_data %>% ddply(.(participant_id, trial_no), mutate, data_point_no = seq_along(time))
+et_data <- et_data %>% group_by(participant_id, trial_no) %>%
+  mutate(data_point_no = seq_along(time))
 
 # make a column with starting time of the trial
-et_data <- et_data %>% ddply(.(participant_id, trial_no), mutate, starting_time = time[data_point_no == 1])
+et_data <- et_data %>% group_by(participant_id, trial_no) %>%
+  mutate(starting_time = time[data_point_no == 1])
 
 # make a column with the time since the beginning of the trial
 et_data$time <- as.numeric(et_data$time)
@@ -75,20 +81,23 @@ et_data$video_stage[et_data$time_since_trial_start > et_data$audio_time_from_sta
 
 ## Adding AOIs
 
-We also add the AOIs for this experiment. Note that this is based on the size of the specific videos we used (400 pixels wide and 226 pixels high).
+We also add the AOIs for this experiment. Note that this is based on the size of the specific videos we used (400 pixels wide and 226 pixels high). Since the Webgazer measures are messy, we add 150 pixels of padding around each edge of the video.
 
 First, add the coordinates for the video on the left (video 1).
 ```{r}
-et_data$vid1_left_x <- (et_data$screenW - 1280)/2
-et_data$vid1_right_x <- et_data$vid1_left_x + 400
-et_data$top_y <- (et_data$screenH - 226)/2
-et_data$bottom_y <- et_data$top_y + 226
+margin_left <- (et_data$screenW - 1280)/2
+margin_top <- (et_data$screenH - 226)/2
+
+et_data$vid1_left_x <- margin_left - 150
+et_data$vid1_right_x <- margin_left + 400 + 150
+et_data$top_y <- margin_top - 150
+et_data$bottom_y <- margin_top + 226 + 150
 ```
 
-Then, add the coordinates for the video on the right (video 2).
+Then, add the coordinates for the video on the right (video 2). The y coordinates for the video on the right are the same as the video on the left.
 ```{r}
-et_data$vid2_left_x <- (et_data$vid1_left_x + 880)
-et_data$vid2_right_x <- (et_data$vid1_right_x + 880)
+et_data$vid2_left_x <- margin_left + 880 - 150
+et_data$vid2_right_x <- margin_left + 1280 + 150
 ```
 
 We add a column that is TRUE if the participant was looking at the video on the left.
@@ -119,7 +128,7 @@ et_data$look_action_video[et_data$look_left_video == TRUE & et_data$action_video
 et_data$look_action_video[et_data$look_right_video == TRUE & et_data$action_video == "right"] <- TRUE
 ```
 
-We also add a column that is TRUE if the participant was looking at the noun video.
+We also add a column that is TRUE if the participant was looking at the noun video. (Since we discount looks that are not to either video, this is not really needed for this analysis, but would be useful if we did not discount those looks.)
 ```{r}
 et_data$look_object_video <- FALSE
 et_data$look_object_video[et_data$look_left_video == TRUE & et_data$action_video == "right"] <- TRUE
@@ -131,27 +140,14 @@ et_data$look_object_video[et_data$look_right_video == TRUE & et_data$action_vide
 
 Finally, we add columns that indicate whether the participant was looking at the action video or the noun video on the previous look.
 ```{r}
-# action video
-et_data <- et_data %>% ddply(.(participant_id, trial_no), mutate, previous_look_action_video = lag(look_action_video))
-
-# noun video
-et_data <- et_data %>% ddply(.(participant_id, trial_no), mutate, previous_look_object_video = lag(look_object_video))
-```
-
-## Proportion of looks
-
-ACTUALLY, THIS DOESN'T MEAN ANYTHING SINCE IT'S NOT SEPARATED OUT BY TYPE OF TRIAL...
-
-We add columns for proportion of looks toward the action video and toward the noun video on a single trial.
-```{r, eval=FALSE}
-et_data <- et_data %>% group_by(participant_id) %>%
-  mutate(proportion_look_action = mean(look_action_video),
-         proportion_look_noun = mean(look_noun_video))
+et_data <- et_data %>% group_by(participant_id, trial_no) %>%
+  mutate(previous_look_action_video = lag(look_action_video),
+         previous_look_object_video = lag(look_object_video))
 ```
 
 ## Write the data to a .csv file
 
-Now the data is ready for visualization and analysis. We write it to a .csv file.
+Now the data is ready for visualization and analysis. We write it to a .csv file. Note that this is an extremely large file, so it is stored in a .zip file on GitHub. 
 ```{r}
 write.csv(et_data, "../data/clean_data.csv")
 ```

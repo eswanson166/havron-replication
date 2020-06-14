@@ -28,7 +28,7 @@ $file_handle = fopen('results/participant_codes.txt', 'a');
 fwrite($file_handle, $participant_id.',');
 fclose($file_handle);
 
-echo("<b>Merci d'avoir participé!</b> <p>Veuillez procéder à: </p> <a href='https://app.prolific.co/submissions/complete?cc=597AED7B'>Prolific</a>")
+echo("<b>Merci d'avoir participé!</b> <p>Veuillez procéder à: </p> <a href='https://app.prolific.co/submissions/complete?cc=18BE4A3D'>Prolific</a>")
 
 //Votre code de participation est: ".$participant_id.".
 

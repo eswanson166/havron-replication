@@ -185,7 +185,7 @@ function make_slides(f) {
 function init_explogic() {
 
   //Experiment constants
-  NUM_CONDITIONS = 2;
+  NUM_CONDITIONS = 1;
   PRECISION_CUTOFF = 50;
   NUM_COLS = 2;
   MIN_WINDOW_WIDTH = 1280;
