@@ -1,0 +1,265 @@
+---
+title: "Havron replication data analysis"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("helpers.R")
+library(lme4)
+library(dplyr)
+library(tidyverse)
+library(eyetrackingR)
+library(MuMIn)
+library(languageR)
+```
+
+## Load the data
+
+Note: the zip file with clean data must be unzipped before running this code.
+```{r}
+et_data <- read.csv("../data/clean_data.csv", stringsAsFactors = TRUE)
+```
+
+
+## Inspect the data
+
+Check the number of participants in each order and condition.
+```{r}
+et_data %>% group_by(order, condition) %>% 
+  summarise(n = length(unique(participant_id)))
+```
+
+The number of participants is distributed relatively equally between the two orders and the two conditions.
+
+Check the gender of participants.
+```{r}
+plyr::count(et_data$gender)
+et_data %>% group_by(participant_id) %>% filter(row_number() == 1) %>% 
+  group_by(gender) %>% summarise(n = n())
+```
+
+Check how much data we retain when we only count looks to the action video or the object video.
+```{r}
+length(et_data$x[et_data$look_left_video == TRUE | 
+                   et_data$look_right_video == TRUE]) / length(et_data$x)
+```
+
+We retain about 45% of the data. The high rate of track loss is not surprising given how noisy online eye-tracking is.
+
+## Pull out the test data
+
+We want to examine the test trials, specifically when they are at the event stage.
+```{r}
+test_data <- et_data %>% filter(descriptor_condition == "test",
+                                video_stage == "event",
+                                look_left_video == TRUE | 
+                                  look_right_video == TRUE)
+```
+
+Add a column for proportion of looks on each test trial.
+```{r}
+test_data <- test_data %>% group_by(participant_id, trial_no) %>%
+  mutate(proportion_look_action = mean(look_action_video))
+```
+
+
+## Linear regression
+
+### Transforming proportion of looks
+
+First, let's make a quick histogram of the values for proportion of looks to the action video.
+```{r}
+hist(unique(test_data$proportion_look_action),
+            main = "Histogram of proportion of looks to action video",
+            xlab = "Proportion of looks to action video")
+```
+
+We see that the values are quite spread out. We will repeat the original authors' analysis, in which they ArcSin-transform the proportion of looks to the action video.
+
+Add a column with ArcSin-transformed proportion of looks toward the action video for each trial.
+```{r}
+test_data <- test_data %>% 
+  mutate(arcsin_prop_action = asin(sqrt((proportion_look_action))))
+```
+
+The histogram of the transformed proportions looks much more normal.
+```{r}
+hist(unique(test_data$arcsin_prop_action),
+     main = "Histogram of ArcSin-transformed proportion of looks to action video",
+            xlab = "ArcSin-transformed proportion of looks to action video")
+```
+
+### Regression model
+
+We only need one data point per test trial per participant, so pull out this data.
+```{r}
+uniq_test_data <- test_data %>% group_by(participant_id, trial_no) %>%
+  filter(row_number() == 1)
+```
+
+Now, we build a mixed effects linear model regressing ArcSin-transformed proportion of looks on condition, with a random intercept for participant.
+```{r}
+lin <- lmer(arcsin_prop_action ~ condition + (1|participant_id), 
+            data = uniq_test_data, REML = F)
+summary(lin)
+```
+
+It looks like the intercept and condition are highly correlated. Try centering condition:
+```{r}
+uniq_test_data$center_condition <- myCenter(uniq_test_data$condition)
+```
+
+Now, we rerun the linear regression.
+```{r}
+lin.cen <- lmer(arcsin_prop_action ~ center_condition + (1|participant_id), 
+            data = uniq_test_data, REML = F)
+summary(lin.cen)
+```
+
+This takes care of the collinearity.
+
+Now, we conduct a likelihood ratio test between the mixed effects linear regression model and the model without the effect of condition:
+```{r}
+lin.base <- lmer(arcsin_prop_action ~ (1|participant_id), data = uniq_test_data, 
+                 REML = F)
+summary(lin.base)
+
+anova(lin.cen, lin.base)
+```
+
+There is a significant main effect of condition on proportion of looks to the action video, where participants in the verb condition have a higher proportion of looks to the action video.
+
+## Logistic regression
+
+Now we build a mixed effects logistic regression model predicting log odds of looking towards the action video over looking towards the object video as a function of condition, with random intercepts for participant and previous look.
+```{r}
+lg <- glmer(look_action_video ~ condition + 
+              previous_look_action_video + 
+              (previous_look_action_video | participant_id), 
+             data = test_data,
+             family = "binomial")
+summary(lg)
+```
+
+
+There is a high correlation between condition and the intercept as well as previous look and the intercept, so we center condition and previous look.
+```{r}
+test_data$center_condition <- myCenter(test_data$condition)
+
+test_data$center_prev_look_action <- myCenter(as.numeric(test_data$previous_look_action_video))
+
+lg.cen <- glmer(look_action_video ~ center_condition + center_prev_look_action + 
+              (1 + center_prev_look_action | participant_id), 
+             data = test_data,
+             family = "binomial")
+summary(lg.cen)
+```
+
+This reduces the collinearity.
+
+Now, we conduct a likelihood ratio test between the logistic regression model and the model without the effect of condition:
+```{r}
+lg.base.con <- glmer(look_action_video ~ center_prev_look_action + 
+              (1 + center_prev_look_action | participant_id), 
+             data = test_data,
+             family = "binomial")
+summary(lg.base.con)
+
+anova(lg.base.con, lg.cen)
+```
+
+There is a significant main effect of condition such that participants in the verb condition were more likely to look to the action video. 
+
+We also conduct a likelihood ratio test between the logistic regression model and the model without the effect of previous gaze:
+```{r}
+lg.base.prev <- glmer(look_action_video ~ center_condition + 
+              (1 | participant_id), 
+             data = test_data,
+             family = "binomial")
+summary(lg.base.prev)
+
+anova(lg.base.prev, lg.cen)
+```
+
+There is a significant main effect of previous look such that if a participant's previous look was to the action video, their next look is more likely to be to the action video as well.
+
+
+## Model Validation
+
+### Linear regression
+
+What is the correlation between predicted and actual proportion of looks?
+```{r}
+uniq_test_data$lin.fitted = fitted(lin.cen)
+cor(uniq_test_data$lin.fitted, uniq_test_data$arcsin_prop_action)
+```
+
+Compute marginal R^2 (variance explained by fixed effects) and conditional R^2 (variance explained by fixed and random effects) for the model:
+```{r}
+r.squaredGLMM(lin.cen) 
+```
+
+### Logistic regression
+
+Get the predictions from the logistic regression model about whether a look will be to the action video.
+```{r}
+test_data$predict_look_action <- predict(lg.cen)
+head(test_data$predict_look_action)
+```
+
+We need to convert these predictions to probabilities.
+```{r}
+test_data$predict_prob_look_action <- logit2prop(test_data$predict_look_action)
+head(test_data$predict_prob_look_action)
+```
+
+Now we convert these predictions to categorical predictions.
+```{r}
+test_data$predict_look_action_realiz <- ifelse(test_data$predict_prob_look_action < .5, FALSE, TRUE)
+```
+
+How well can we predict whether a look will be to the action video?
+```{r}
+prop.table(table(test_data[,c("look_action_video","predict_look_action_realiz")]))
+```
+
+Compute the proportion of correctly realized cases.
+```{r}
+test_data$prediction <- ifelse(test_data$predict_look_action_realiz == test_data$look_action_video, "correct", "incorrect")
+prop.table(table(test_data$prediction))
+```
+
+We predict whether a look will be to the action video correctly in about 88% of cases.
+
+Compute marginal R^2 (variance explained by fixed effects) and conditional R^2 (variance explained by fixed and random effects) for the model:
+```{r}
+r.squaredGLMM(lg.cen) 
+```
+
+
+## Cluster-based permutation analysis
+
+```{r, eval = FALSE}
+# There is a problem with this because our eye-tracker did not sample at uniform sampling rate--it usually sampled about every 30 ms, but sometimes slightly more or less.
+
+test_data$trackloss <- FALSE
+test_df <- make_eyetrackingr_data(test_data, 
+                                  participant_column = "participant_id",
+                                  trial_column = "trial_no",
+                                  time_column = "time_since_trial_start",
+                                  trackloss_column = "trackloss",
+                                  aoi_columns = "look_action_video",
+                                  treat_non_aoi_looks_as_missing = TRUE)
+
+test_df <- make_time_sequence_data(test_df, time_bin_size = 20,
+                                   predictor_columns = c("condition"),
+                                   other_dv_columns = c("arcsin_prop_action"),
+                                   summarize_by = "participant_id")
+test_df <- make_time_cluster_data(test_df, predictor = "condition",
+                                       aoi = "look_action_video",
+                                       test = "t.test",
+                                       threshold = 1.5,
+                                       formula = arcsin_prop_action ~ condition)
+head(test_df)
+```

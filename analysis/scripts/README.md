@@ -1,0 +1,3 @@
+This folder contains a script to clean eye-tracking data (data_cleaning.Rmd), the script for data visualization (data_visualization.Rmd), and the script for data analysis (data_analysis.Rmd). Helper functions used in the scripts can be found in helpers.R.
+
+The file process_raw_data.py was used to process the raw .txt files that were created using the collectdata.php script. These .txt files were not included here because they contained identifying information. The output of process_raw_data.py is the raw_data.zip folder.
